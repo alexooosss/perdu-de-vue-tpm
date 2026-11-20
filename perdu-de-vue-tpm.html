@@ -1,0 +1,966 @@
+<title>Perdu de vue</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Direction : clair et aéré. Surfaces blanches, un seul bleu d'action, beaucoup d'air, cibles tactiles ≥ 48px.
+   Mise en page : mobile first ; accueil scindé dès 720px ; espace agent avec barre d'onglets en bas sur mobile, menu latéral dès 900px */
+:root{
+  --bg:#F6F8FB; --surface:#FFFFFF; --surface-2:#F0F3F8; --ink:#101828; --muted:#5D6B7E; --line:#E4E9F0;
+  --sea:#1764E0; --sea-ink:#FFFFFF; --sea-soft:#EAF1FD; --sun:#FFC54D; --sun-ink:#3B2700; --sun-soft:#FFF5DE;
+  --ok:#14804A; --ok-bg:#E6F6EC; --warn:#9A5B00; --warn-bg:#FFF3DC; --bad:#C2312A; --bad-bg:#FDECEA; --info:#1764E0; --info-bg:#EAF1FD;
+  --shadow:0 1px 2px rgba(16,24,40,.04),0 4px 16px rgba(16,24,40,.05);
+  --shadow-lg:0 2px 4px rgba(16,24,40,.04),0 16px 40px rgba(16,24,40,.08);
+  --f-display:"Plus Jakarta Sans","Inter",system-ui,sans-serif;
+  --f-body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:16px; color-scheme:light;
+}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--f-body);margin:0;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--surface)}
+h1,h2,h3{font-family:var(--f-display);line-height:1.2;text-wrap:balance;margin:0;letter-spacing:-.02em}
+h1{font-size:1.65rem;font-weight:800}
+h2{font-size:1.2rem;font-weight:700}
+h3{font-size:1.02rem;font-weight:700}
+@media(min-width:720px){h1{font-size:2rem}}
+p{margin:0}
+a{color:var(--sea);font-weight:600;text-underline-offset:3px}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid color-mix(in srgb,var(--sea) 55%,transparent);outline-offset:2px;border-radius:8px}
+.mono{font-family:var(--f-mono);font-size:.8em;letter-spacing:.01em}
+.muted{color:var(--muted)}
+.small{font-size:.875rem}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.stack{display:flex;flex-direction:column;gap:16px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* Bandeau prototype : discret */
+.demo{position:relative;z-index:20;background:var(--surface-2);color:var(--muted);font-size:.78rem;border-bottom:1px solid var(--line)}
+.demo .in{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-block:6px;max-width:1240px;margin:0 auto}
+.seg{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px;margin-left:auto}
+.seg button{border:0;background:transparent;color:var(--muted);padding:5px 14px;border-radius:999px;cursor:pointer;font-weight:600}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+.demo .reset{background:transparent;border:0;color:var(--muted);cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:4px}
+
+/* En-tête habitant */
+.uhead{background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);z-index:10}
+.uhead .in{display:flex;align-items:center;gap:12px;padding-block:10px;max-width:1100px;margin:0 auto}
+.logo{border:1.5px dashed var(--line);border-radius:10px;padding:5px 9px;font-size:.6rem;line-height:1.15;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:center;cursor:pointer;background:var(--surface-2)}
+.brand{flex:1;text-align:center;font-family:var(--f-display);font-weight:800;font-size:1.15rem;letter-spacing:-.02em;cursor:pointer;background:none;border:0;padding:0}
+.brand span{color:var(--sea)}
+main{min-height:60vh}
+.wrap{max-width:1100px;margin:0 auto;padding-block:24px 56px}
+.narrow{max-width:600px;margin:0 auto}
+
+/* Boutons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:12px 20px;border-radius:12px;border:1px solid transparent;font-weight:600;cursor:pointer;text-decoration:none;background:var(--sea);color:var(--sea-ink);transition:background-color .15s,box-shadow .15s,transform .08s;box-shadow:0 1px 2px rgba(16,24,40,.08)}
+.btn:hover{background:color-mix(in srgb,var(--sea) 88%,var(--ink))}
+.btn:active{transform:scale(.99)}
+.btn.sec{background:var(--surface);color:var(--ink);border-color:var(--line)}
+.btn.sec:hover{background:var(--surface-2)}
+.btn.ghost{background:transparent;color:var(--sea);box-shadow:none;padding-inline:10px}
+.btn.ghost:hover{background:var(--sea-soft)}
+.btn.sun{background:var(--sun);color:var(--sun-ink)}
+.btn.sun:hover{background:color-mix(in srgb,var(--sun) 90%,var(--ink))}
+.btn.bad{background:var(--surface);color:var(--bad);border-color:color-mix(in srgb,var(--bad) 30%,var(--line))}
+.btn.bad:hover{background:var(--bad-bg)}
+.btn.ok{background:var(--ok);color:var(--surface)}
+.btn.ok:hover{background:color-mix(in srgb,var(--ok) 88%,var(--ink))}
+.btn.sm{min-height:40px;padding:8px 14px;font-size:.875rem;border-radius:10px}
+.btn.block{width:100%}
+.btn[disabled]{opacity:.45;cursor:not-allowed;box-shadow:none}
+.back{display:inline-flex;align-items:center;gap:6px;background:none;border:0;color:var(--muted);cursor:pointer;padding:8px 0;font-weight:600;font-size:.9rem;align-self:flex-start;min-height:40px}
+.back:hover{color:var(--ink)}
+
+/* Accueil scindé */
+.split{display:grid;grid-template-columns:1fr;gap:12px}
+.half{padding:24px 20px;display:flex;flex-direction:column;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}
+.half h2{font-size:1.45rem;font-weight:800;max-width:18ch}
+.half p{color:var(--muted);max-width:36ch}
+.half{text-align:center;align-items:center}
+.bigbtn{margin-top:8px;display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:60px;padding:12px 20px;border-radius:16px;font-family:var(--f-display);font-weight:700;font-size:1.1rem;border:0;cursor:pointer;transition:transform .1s,box-shadow .15s}
+.bigbtn:hover{box-shadow:var(--shadow-lg)}
+.bigbtn .ico{width:28px;height:28px;display:grid;place-items:center}
+.bigbtn .ico svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.bigbtn.lost{background:var(--sea);color:var(--sea-ink)}
+.bigbtn.found{background:var(--sun);color:var(--sun-ink)}
+.half.lostside{order:-1;background:linear-gradient(160deg,var(--sea-soft),var(--surface) 70%)}
+@media(min-width:720px){
+  .split{grid-template-columns:1fr 1fr;gap:0;background:var(--surface);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);overflow:hidden}
+  .half{border:0;border-radius:0;box-shadow:none;padding:44px 40px;min-height:340px}
+  .half.lostside{order:0}
+  .half + .half{border-left:1px solid var(--line)}
+  .half h2{font-size:1.9rem}
+  .bigbtn{margin-top:auto;width:auto;align-self:center;padding-inline:28px}
+}
+.notice{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:14px;background:var(--surface-2)}
+.notice .ni{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:.8rem}
+.notice b{display:block;font-weight:600}
+.notice .small{color:var(--muted)}
+.notice.warn{background:var(--warn-bg)}.notice.warn .ni{background:var(--warn);color:var(--warn-bg)}
+.notice.info{background:var(--info-bg)}.notice.info .ni{background:var(--info);color:var(--info-bg)}
+.notice.ok{background:var(--ok-bg)}.notice.ok .ni{background:var(--ok);color:var(--ok-bg)}
+.notice.bad{background:var(--bad-bg)}.notice.bad .ni{background:var(--bad);color:var(--bad-bg)}
+.infos{display:grid;gap:12px;grid-template-columns:1fr}
+@media(min-width:720px){.infos{grid-template-columns:repeat(3,1fr)}}
+.info-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:4px}
+.eyebrow{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.counter{font-family:var(--f-display);font-size:2rem;font-weight:800;color:var(--sea);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+
+/* Formulaire */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:var(--shadow)}
+@media(min-width:560px){.card{padding:28px}}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label,.lab{font-weight:600;font-size:.92rem}
+.field .hint{font-size:.8rem;color:var(--muted)}
+.input,select.input,textarea.input{width:100%;min-height:50px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);transition:border-color .15s,background-color .15s,box-shadow .15s;font-size:1rem}
+.input::placeholder{color:color-mix(in srgb,var(--muted) 75%,transparent)}
+textarea.input{min-height:120px;resize:vertical}
+.input:hover{border-color:color-mix(in srgb,var(--muted) 35%,var(--line))}
+.input:focus{border-color:var(--sea);background:var(--surface);outline:none;box-shadow:0 0 0 4px var(--sea-soft)}
+.input[aria-invalid="true"]{border-color:var(--bad);background:var(--bad-bg)}
+.err{color:var(--bad);font-size:.82rem;font-weight:600}
+.grid2{display:grid;gap:16px;grid-template-columns:1fr}
+@media(min-width:560px){.grid2{grid-template-columns:1fr 1fr}}
+.file{position:relative;display:flex;align-items:center;justify-content:center;gap:10px;min-height:50px;padding:10px 14px;border:1.5px dashed var(--line);border-radius:12px;cursor:pointer;color:var(--sea);font-weight:600;background:var(--surface);transition:border-color .15s,background-color .15s}
+.file:hover{border-color:var(--sea);background:var(--sea-soft)}
+.file input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-size:.85rem;font-weight:500;cursor:pointer;min-height:36px;transition:background-color .15s,border-color .15s}
+.chip:hover{border-color:var(--sea);color:var(--sea)}
+.chip[aria-pressed="true"]{background:var(--sea-soft);color:var(--sea);border-color:var(--sea)}
+
+/* Lignes de transport */
+.line{display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:.72rem;padding:3px 8px;border-radius:6px;white-space:nowrap}
+.line.tram{background:var(--sun-soft);color:var(--sun-ink);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--sun) 60%,transparent)}
+.line.bus{background:var(--sea-soft);color:var(--sea)}
+.line.none{background:var(--surface-2);color:var(--muted)}
+
+/* Cartes objet */
+.results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media(min-width:720px){.results{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}}
+.ocard{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;text-align:left;padding:0;box-shadow:var(--shadow);transition:box-shadow .2s,transform .2s,border-color .2s}
+.ocard:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px);border-color:color-mix(in srgb,var(--sea) 40%,var(--line))}
+.thumb{position:relative;aspect-ratio:1/1;max-width:100%;display:grid;place-items:center;overflow:hidden}
+.thumb svg{width:44%;height:44%;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.thumb.masked svg{filter:blur(4px);opacity:.75}
+.thumb.masked img{filter:blur(7px) saturate(.9);transform:scale(1.12)}
+.thumb.has-photo{background:var(--surface-2)!important}
+.ic img{width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.ic.has-photo{background:var(--surface-2)!important;overflow:hidden}
+.thumb .pct{position:absolute;top:10px;right:10px;background:var(--surface);color:var(--ink);font-weight:700;font-size:.82rem;padding:3px 10px;border-radius:999px;font-variant-numeric:tabular-nums;box-shadow:var(--shadow)}
+.thumb .mask{position:absolute;left:10px;bottom:10px;font-size:.66rem;font-weight:600;background:color-mix(in srgb,var(--surface) 88%,transparent);padding:3px 8px;border-radius:999px;color:var(--muted)}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.obar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px}
+.obar .t{flex:1 0 100%;min-width:0;font-weight:600;font-size:.9rem;line-height:1.25}
+.obar .eye{margin-left:auto}
+.eye{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--sea-soft);color:var(--sea)}
+.eye svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2}
+.swatch{display:inline-block;width:12px;height:12px;border-radius:50%;border:1px solid color-mix(in srgb,var(--ink) 20%,transparent);vertical-align:-1px}
+
+/* Fiche objet */
+.fiche{display:grid;gap:20px}
+@media(min-width:760px){.fiche{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}}
+.fiche > .thumb{border-radius:24px;border:1px solid var(--line)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:10px 18px;margin:0}
+.kv dt{color:var(--muted);font-size:.9rem}
+.kv dd{margin:0;font-weight:500;min-width:0}
+.meter{height:6px;border-radius:999px;background:var(--surface-2);overflow:hidden}
+.meter i{display:block;height:100%;border-radius:inherit;background:var(--sea)}
+
+/* Suivi */
+.tl{list-style:none;padding:0;margin:0;display:flex;flex-direction:column}
+.tl li{display:grid;grid-template-columns:28px 1fr;gap:14px;position:relative;padding-bottom:18px}
+.tl li:not(:last-child)::before{content:"";position:absolute;left:13px;top:30px;bottom:2px;width:2px;border-radius:2px;background:var(--line)}
+.tl li.done:not(:last-child)::before{background:var(--sea)}
+.tl .dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);background:var(--surface);display:grid;place-items:center;font-size:.75rem;font-weight:700;color:var(--muted)}
+.tl li.done .dot{background:var(--sea);border-color:var(--sea);color:var(--sea-ink)}
+.tl li.now .dot{border-color:var(--sea);color:var(--sea);box-shadow:0 0 0 5px var(--sea-soft)}
+.tl li b{font-weight:600}
+.tl li:not(.done):not(.now) b{color:var(--muted);font-weight:500}
+.tl li.now b{color:var(--sea)}
+.dlist{display:flex;flex-direction:column;gap:8px}
+.ditem{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--surface);cursor:pointer;text-align:left;width:100%;min-height:64px}
+.ditem:hover{border-color:color-mix(in srgb,var(--sea) 40%,var(--line))}
+.ditem[aria-current="true"]{border-color:var(--sea);box-shadow:0 0 0 3px var(--sea-soft)}
+.ditem .ic,.li .ic{flex:none;width:42px;height:42px;border-radius:12px;display:grid;place-items:center}
+.ditem .ic svg,.li .ic svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.ditem .tx{flex:1;min-width:0}
+.ditem .tx b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:.73rem;font-weight:600;padding:3px 10px;border-radius:999px;white-space:nowrap}
+.badge::before{content:attr(data-i);font-size:.68rem}
+.b-ok{background:var(--ok-bg);color:var(--ok)}
+.b-warn{background:var(--warn-bg);color:var(--warn)}
+.b-bad{background:var(--bad-bg);color:var(--bad)}
+.b-info{background:var(--info-bg);color:var(--info)}
+.b-neutral{background:var(--surface-2);color:var(--muted)}
+
+/* Créneaux */
+.days{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px}
+.day{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:10px 16px;text-align:center;cursor:pointer;min-width:80px;line-height:1.25}
+.day b{display:block;font-family:var(--f-display);font-size:1.35rem;font-weight:700}
+.day:hover{border-color:var(--sea)}
+.day[aria-pressed="true"]{background:var(--sea);border-color:var(--sea);color:var(--sea-ink)}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px}
+.slot{border:1px solid var(--line);background:var(--surface);border-radius:12px;min-height:48px;font-weight:600;cursor:pointer;font-variant-numeric:tabular-nums;transition:border-color .15s,background-color .15s}
+.slot:hover:not([disabled]){border-color:var(--sea);color:var(--sea)}
+.slot[disabled]{background:transparent;color:color-mix(in srgb,var(--muted) 55%,transparent);text-decoration:line-through;cursor:not-allowed;border-style:dashed}
+.slot[aria-pressed="true"]{background:var(--sea);color:var(--sea-ink);border-color:var(--sea)}
+.ticket{border-radius:20px;padding:20px;display:grid;gap:10px;background:var(--sea-soft);border:1px solid color-mix(in srgb,var(--sea) 25%,transparent)}
+.ticket .code{font-family:var(--f-mono);font-size:1.5rem;font-weight:500;letter-spacing:.08em;color:var(--sea)}
+
+/* Pied */
+.ufoot{border-top:1px solid var(--line);background:var(--surface)}
+.ufoot .in{max-width:1100px;margin:0 auto;padding-block:20px;display:flex;flex-wrap:wrap;gap:8px 22px;font-size:.8rem;color:var(--muted)}
+
+/* ---------- Espace agent ---------- */
+.agent{display:grid;grid-template-columns:1fr;min-height:calc(100vh - 34px)}
+.side{background:var(--surface);border-bottom:1px solid var(--line)}
+.side .in{display:flex;flex-direction:column;gap:2px;padding-block:12px}
+.side .top{display:flex;align-items:center;gap:10px}
+.side .top::before{content:"";width:34px;height:34px;flex:none;border-radius:10px;background:var(--sea) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='6'/%3E%3Cpath d='m20 20-4.5-4.5'/%3E%3C/svg%3E") center/18px no-repeat}
+.side .t{font-family:var(--f-display);font-weight:800;font-size:1.05rem;letter-spacing:-.02em}
+.side .t small{display:block;font-family:var(--f-body);font-weight:500;font-size:.74rem;color:var(--muted);letter-spacing:0}
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:25;display:grid;grid-template-columns:repeat(5,1fr);background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:6px max(6px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-left,0px))}
+.nav button{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;background:transparent;color:var(--muted);padding:6px 2px;border-radius:12px;cursor:pointer;font-weight:600;font-size:.68rem;min-height:54px}
+.nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav button[aria-current="page"]{color:var(--sea);background:var(--sea-soft)}
+.nav .long{display:none}
+.nav .n{position:absolute;top:2px;left:calc(50% + 6px);background:var(--bad);color:var(--surface);font-size:.66rem;font-weight:700;border-radius:999px;padding:0 6px;line-height:16px}
+.who{display:none}
+.amain{min-width:0;padding-block:22px 110px}
+.amain .in{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+@media(min-width:900px){
+  .agent{grid-template-columns:248px 1fr}
+  .side{border-bottom:0;border-right:1px solid var(--line)}
+  .side .in{position:sticky;top:0;padding-block:22px;min-height:calc(100vh - 34px)}
+  .nav{position:static;display:flex;flex-direction:column;gap:2px;background:none;backdrop-filter:none;border:0;padding:0;margin-top:26px}
+  .nav button{flex-direction:row;justify-content:flex-start;gap:12px;font-size:.92rem;font-weight:500;min-height:44px;padding:10px 12px;color:var(--ink)}
+  .nav button:hover{background:var(--surface-2)}
+  .nav button[aria-current="page"]{font-weight:600}
+  .nav button svg{width:20px;height:20px;color:var(--muted)}
+  .nav button[aria-current="page"] svg{color:var(--sea)}
+  .nav .long{display:inline}.nav .short{display:none}
+  .nav .n{position:static;margin-left:auto;padding:1px 8px;line-height:1.4}
+  .who{display:flex;margin-top:auto;gap:10px;align-items:center;font-size:.85rem;padding:12px;border-top:1px solid var(--line)}
+  .who i{width:34px;height:34px;border-radius:50%;background:var(--sun-soft);color:var(--sun-ink);display:grid;place-items:center;font-style:normal;font-weight:700;font-size:.8rem}
+  .who span{color:var(--muted)}
+  .amain{padding-block:32px 60px}
+}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media(min-width:760px){.kpis{grid-template-columns:repeat(5,minmax(0,1fr))}}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:2px;text-align:left;cursor:pointer;box-shadow:var(--shadow);transition:border-color .15s,box-shadow .15s}
+.kpi:hover{border-color:color-mix(in srgb,var(--sea) 40%,var(--line));box-shadow:var(--shadow-lg)}
+.kpi b{font-family:var(--f-display);font-size:1.9rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1;letter-spacing:-.02em}
+.kpi span{font-size:.8rem;color:var(--muted)}
+.kpi.hot b{color:var(--sea)}
+.kpi.hot{background:linear-gradient(160deg,var(--sea-soft),var(--surface) 80%);border-color:color-mix(in srgb,var(--sea) 30%,var(--line))}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0;box-shadow:var(--shadow)}
+.panel-h{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.list{display:flex;flex-direction:column}
+.li{display:flex;gap:12px;align-items:center;padding:12px 8px;margin-inline:-8px;border-top:1px solid var(--line);cursor:pointer;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;width:calc(100% + 16px);border-radius:0;transition:background-color .12s}
+.li:first-child{border-top:0}
+.li:hover{background:var(--surface-2);border-radius:12px}
+.li[aria-current="true"]{background:var(--sea-soft);border-radius:12px}
+.li .tx{flex:1;min-width:0}
+.li .tx b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.li .meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none}
+@media(max-width:559px){.li{flex-wrap:wrap}.li .tx{flex-basis:calc(100% - 56px)}.li .meta{width:100%;flex-direction:row;align-items:center;justify-content:flex-start;padding-left:54px;gap:8px}}
+.kpi:last-child:nth-child(odd){grid-column:1/-1}
+@media(min-width:760px){.kpi:last-child:nth-child(odd){grid-column:auto}}
+.cmp{display:grid;gap:16px;grid-template-columns:1fr}
+@media(min-width:900px){.cmp{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);align-items:start}}
+.cand{border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.cand.claimed{border-color:var(--sea);box-shadow:0 0 0 3px var(--sea-soft)}
+.cand-h{display:flex;gap:12px;align-items:center}
+.cand-h .thumb{width:60px;flex:none;border-radius:14px}
+.why{list-style:none;margin:0;padding:0;display:grid;gap:4px;font-size:.88rem}
+.why li{display:flex;gap:8px}
+.why .k{width:18px;flex:none;font-weight:700;text-align:center}
+.why .ok{color:var(--ok)}.why .mid{color:var(--warn)}.why .ko{color:var(--bad)}
+.private{background:var(--surface-2);border-radius:14px;padding:14px;display:grid;gap:6px;font-size:.88rem}
+.private .eyebrow{display:flex;gap:6px;align-items:center}
+.fab{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:15;box-shadow:var(--shadow-lg);border-radius:16px;min-height:52px}
+@media(min-width:900px){.fab{bottom:calc(24px + env(safe-area-inset-bottom,0px));right:max(24px,env(safe-area-inset-right,0px))}}
+.filters{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 4px}
+.filters .chip{flex:none}
+.check{display:flex;gap:12px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:14px;cursor:pointer;min-height:56px;transition:background-color .15s,border-color .15s}
+.check input{width:22px;height:22px;flex:none;accent-color:var(--ok);margin:0}
+.check:has(input:checked){border-color:color-mix(in srgb,var(--ok) 50%,var(--line));background:var(--ok-bg)}
+.hist{list-style:none;margin:0;padding:0;display:grid;gap:8px;font-size:.85rem}
+.hist li{display:grid;grid-template-columns:auto 1fr;gap:12px}
+.hist time{color:var(--muted);font-variant-numeric:tabular-nums}
+.agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:8px}
+.aslot{border:1px solid var(--line);border-radius:10px;padding:6px 4px;font-size:.8rem;font-weight:600;background:var(--surface);cursor:pointer;text-align:center;font-variant-numeric:tabular-nums;min-height:48px}
+.aslot:hover:not(.booked){border-color:var(--sea)}
+.aslot.booked{background:var(--sea-soft);color:var(--sea);border-color:transparent;cursor:default}
+.aslot.closed{background:transparent;color:var(--muted);text-decoration:line-through;border-style:dashed}
+.aslot small{display:block;font-weight:500;font-size:.66rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.preview{width:100%;aspect-ratio:4/3;max-width:100%;border-radius:16px;background:var(--surface-2);display:grid;place-items:center;overflow:hidden;color:var(--muted);border:1px dashed var(--line)}
+.preview img{width:100%;height:100%;object-fit:cover}
+.preview svg{width:30%;height:30%;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.ai-tag{display:inline-flex;align-items:center;gap:6px;font-size:.73rem;font-weight:600;color:var(--info);background:var(--info-bg);padding:4px 10px;border-radius:999px;align-self:flex-start}
+
+/* Toast */
+.toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:12px 18px;border-radius:14px;font-weight:500;z-index:50;max-width:min(92vw,520px);box-shadow:var(--shadow-lg);font-size:.9rem}
+@media(min-width:900px){.toast{bottom:calc(24px + env(safe-area-inset-bottom,0px))}}
+@media (prefers-reduced-motion:no-preference){.view{animation:in .2s ease-out}@keyframes in{from{transform:translateY(4px)}to{transform:none}}}
+.logo.has-img{border:0;background:none;padding:0}.logo.has-img span{display:none}.logo img{height:40px;width:auto;display:block}
+.alogo{height:34px;width:auto}.side .top:has(.alogo)::before{display:none}
+</style>
+
+<div class="demo"><div class="in gut">
+  <span class="tag">Prototype · cas pédagogique fictif · IA simulée</span>
+  <div class="seg" role="group" aria-label="Interface affichée">
+    <button type="button" data-act="mode" data-v="user" id="m-user">Habitant</button>
+    <button type="button" data-act="mode" data-v="agent" id="m-agent">Agent</button>
+  </div>
+  <button type="button" class="reset" data-act="reset">Réinitialiser</button>
+</div></div>
+<div id="app"></div>
+<div id="toast" class="toast" role="status" hidden></div>
+
+<script>
+/* ===================== Données de référence ===================== */
+const TODAY = '2026-11-20';
+const CATS = {
+  sac:{l:'Sac / bagage'}, ecouteurs:{l:'Écouteurs'}, telephone:{l:'Téléphone'}, cles:{l:'Clés'},
+  vetement:{l:'Vêtement'}, lunettes:{l:'Lunettes'}, parapluie:{l:'Parapluie'}, jouet:{l:'Jouet / doudou'},
+  montre:{l:'Montre / bijou'}, autre:{l:'Autre objet'}, sensible:{l:'Papiers, argent ou carte bancaire'}
+};
+const ICONS = {
+  sac:'<path d="M7 8a5 5 0 0 1 10 0"/><rect x="5" y="8" width="14" height="13" rx="3"/><path d="M9 14h6v4H9z"/>',
+  ecouteurs:'<path d="M7 4a3 3 0 0 1 3 3v3a3 3 0 0 1-3 3"/><path d="M7 13v7"/><path d="M17 4a3 3 0 0 0-3 3v3a3 3 0 0 0 3 3"/><path d="M17 13v7"/>',
+  telephone:'<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/>',
+  cles:'<circle cx="8" cy="8" r="4.5"/><path d="M11.2 11.2 20 20"/><path d="M16 16l2-2M18.5 18.5l2-2"/>',
+  vetement:'<path d="M8 3 4 6l2 4 2-1v12h8V9l2 1 2-4-4-3c0 2-1.8 3-4 3S8 5 8 3z"/>',
+  lunettes:'<circle cx="6.5" cy="14" r="3.5"/><circle cx="17.5" cy="14" r="3.5"/><path d="M10 14c1.2-1 2.8-1 4 0"/><path d="M3 13 4.5 7M21 13l-1.5-6"/>',
+  parapluie:'<path d="M3 12a9 9 0 0 1 18 0z"/><path d="M12 12v7a2 2 0 0 1-4 0"/><path d="M12 3v0"/>',
+  jouet:'<circle cx="12" cy="14" r="6"/><path d="M8.5 9.5 7 3.5 10.5 8.5M15.5 9.5 17 3.5 13.5 8.5"/><circle cx="10" cy="13.5" r=".6"/><circle cx="14" cy="13.5" r=".6"/>',
+  montre:'<circle cx="12" cy="12" r="5.5"/><path d="M9 6.8 9.8 2h4.4L15 6.8M9 17.2 9.8 22h4.4l.8-4.8"/><path d="M12 9.5V12l1.8 1.2"/>',
+  autre:'<path d="M9 2h6v3H9z"/><path d="M8 5h8l1 3v12a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V8z"/>',
+  sensible:'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><path d="M15 14.5h3"/>'
+};
+const EYE = '<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const COLORS = {noir:'#1d1f21',blanc:'#F4F4F2',gris:'#98A2A8',argent:'#C9CED2',bleu:'#2F5FB3',rouge:'#C8372D',vert:'#3C8A4A',jaune:'#E8C13A',rose:'#E48BB0',marron:'#7A4E2D',beige:'#D9C7A6'};
+const COLOR_WORDS = {noir:['noir','noire'],blanc:['blanc','blanche'],gris:['gris','grise'],argent:['argent','argente','argentee'],bleu:['bleu','bleue','marine'],rouge:['rouge'],vert:['vert','verte'],jaune:['jaune'],rose:['rose'],marron:['marron','brun'],beige:['beige']};
+const LINES = ['Tram T1','Tram T2','Bus 3','Bus 8','Bus 15','Bus 23'];
+const OPEN_DAYS = ['2026-11-20','2026-11-24','2026-11-26','2026-11-27'];
+const TIMES = (()=>{const t=[];for(let h=9;h<12;h++)for(let m=0;m<60;m+=10)t.push(String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'));return t})();
+const ADDRESS = 'Mairie · Bureau des objets trouvés (adresse à confirmer)';
+const HOURS = 'Mardi, jeudi et vendredi, 9 h – 12 h, sur rendez-vous';
+
+const DST = {
+  resultats:{l:'Objets proposés',c:'b-info',i:'●'},
+  veille:{l:'Veille active',c:'b-neutral',i:'◌'},
+  verif:{l:'Vérification agent',c:'b-warn',i:'!'},
+  precision:{l:'Précision demandée',c:'b-warn',i:'?'},
+  validee:{l:'Correspondance validée',c:'b-ok',i:'✓'},
+  rdv:{l:'RDV fixé',c:'b-ok',i:'◷'},
+  restituee:{l:'Restitué',c:'b-ok',i:'✓'},
+  refusee:{l:'Non confirmée',c:'b-bad',i:'✕'},
+  annulee:{l:'Annulée',c:'b-neutral',i:'–'}
+};
+const OST = {
+  stock:{l:'En stock',c:'b-info',i:'■'},
+  correspondance:{l:'Correspondance',c:'b-warn',i:'!'},
+  rdv:{l:'RDV fixé',c:'b-ok',i:'◷'},
+  restitue:{l:'Restitué',c:'b-ok',i:'✓'},
+  police:{l:'Transmis à la police',c:'b-bad',i:'⚑'}
+};
+
+function seed(){
+  const o=(id,ref,cat,color,line,date,brand,title,priv,q,a,kw,shelf,status='stock',agent='Sophie M.')=>({id,ref,cat,color,line,date,brand,title,priv,q,a,kw,shelf,status,agent,photo:'img/'+id.toLowerCase()+'.jpg'});
+  const objects=[
+    o('O1','PDV-2026-0287','sac','bleu','Tram T1','2026-11-18','Eastpak','Sac à dos bleu marine','Porte-clés en forme de tortue, cahier à spirale à l’intérieur','Qu’est-ce qui est accroché au sac ?','Un porte-clés tortue',['tortue','cahier'],'B3'),
+    o('O2','PDV-2026-0291','sac','bleu','Bus 3','2026-11-19','Sans marque','Sac à dos bleu clair','Poche avant décousue, pull gris à l’intérieur','Que contient le sac ?','Un pull gris',['pull','decousu'],'B3','stock','Julien R.'),
+    o('O3','PDV-2026-0279','sac','noir','Bus 8','2026-11-16','Decathlon','Sac de sport noir','Gourde verte et serviette dans la poche principale','Que contient la poche principale ?','Une gourde et une serviette',['gourde','serviette'],'B4'),
+    o('O4','PDV-2026-0283','ecouteurs','blanc','Bus 8','2026-11-17','Apple','Écouteurs sans fil blancs','Prénom « Tom » gravé sur le boîtier','Y a-t-il une inscription sur le boîtier ?','Le prénom Tom',['tom','grave'],'A1'),
+    o('O5','PDV-2026-0275','ecouteurs','blanc','Bus 3','2026-11-15','Samsung','Écouteurs sans fil blancs','Boîtier rayé sur le dessus','Le boîtier a-t-il un signe particulier ?','Rayé sur le dessus',['raye','rayure'],'A1','stock','Nadia B.'),
+    o('O6','PDV-2026-0289','ecouteurs','blanc','Tram T1','2026-11-18','Sans marque','Écouteurs sans fil blancs','Coque en silicone transparente','Le boîtier est-il protégé ?','Coque transparente',['coque','silicone','transparent'],'A1'),
+    o('O7','PDV-2026-0262','parapluie','noir','Bus 15','2026-11-12','Sans marque','Parapluie long noir','Poignée en bois clair','Comment est la poignée ?','En bois',['bois'],'C2'),
+    o('O8','PDV-2026-0241','vetement','bleu','Bus 3','2026-11-08','Levi’s','Veste en jean, taille M','Étoile brodée sur la manche gauche','Y a-t-il un motif sur la veste ?','Une étoile brodée',['etoile','brode'],'D1','rdv'),
+    o('O9','PDV-2026-0293','jouet','beige','Tram T1','2026-11-19','Sans marque','Doudou lapin','Oreille gauche recousue au fil rouge','Un détail sur les oreilles ?','Recousue au fil rouge',['lapin','oreille','recousu'],'A3','stock','Julien R.'),
+    o('O10','PDV-2026-0268','lunettes','noir','Bus 23','2026-11-14','Ray-Ban','Lunettes de vue','Étui rouge d’un opticien de La Seyne','De quelle couleur est l’étui ?','Rouge',['etui','rouge'],'A2'),
+    o('O11','PDV-2026-0266','telephone','noir','Bus 8','2026-11-13','Apple','Smartphone noir','Coque noire fissurée dans le coin, fond d’écran plage','Comment est la coque ?','Noire, fissurée dans un coin',['fissure','coque','plage'],'Coffre'),
+    o('O12','PDV-2026-0258','autre','vert','Tram T2','2026-11-11','Sans marque','Gourde isotherme verte','Autocollant « Mont Faron »','Y a-t-il un autocollant ?','Mont Faron',['faron','autocollant'],'C1','stock','Nadia B.'),
+    o('O13','PDV-2026-0294','sensible','marron','Bus 3','2026-11-19','—','Portefeuille marron','Contient une carte bancaire et une carte d’identité','—','—',[],'—','police'),
+    o('O14','PDV-2025-0571','parapluie','rouge','Bus 8','2025-11-24','Sans marque','Parapluie pliant rouge','Housse à pois','Un détail ?','Housse à pois',['pois'],'C2'),
+    o('O15','PDV-2026-0255','cles','gris','Tram T2','2026-11-10','—','Trousseau de 3 clés','Porte-clés cigale en céramique et badge d’immeuble bleu','Qu’y a-t-il sur le trousseau ?','Une cigale et un badge',['cigale','badge'],'Coffre','stock','Julien R.')
+  ];
+  const h=(t,x)=>({t,x});
+  const demandes=[
+    {id:'D1',ref:'DEM-2026-0412',name:'Camille R.',contact:'camille.r@exemple.fr',cat:'vetement',desc:'Veste en jean bleue, taille M, avec une étoile brodée',date:'2026-11-07',line:'Bus 3',status:'rdv',claim:['O8'],answer:'Une étoile brodée sur la manche gauche',validated:'O8',rdv:{day:'2026-11-20',time:'10:20',code:'RDV-3172'},msg:'',
+      hist:[h('10/11 09:12','Demande envoyée'),h('10/11 09:12','Suggestion IA : 1 objet (93 %)'),h('12/11 10:05','Validée par Sophie M.'),h('12/11 18:40','RDV réservé le 20/11 à 10:20')]},
+    {id:'D2',ref:'DEM-2026-0418',name:'Tom L.',contact:'tom.l@exemple.fr',cat:'ecouteurs',desc:'Écouteurs sans fil blancs dans leur boîtier, oubliés sur un siège',date:'2026-11-16',line:'Bus 8',status:'verif',claim:['O4','O6'],answer:'Mon prénom est gravé dessus',msg:'',
+      hist:[h('18/11 19:02','Demande envoyée'),h('18/11 19:02','Suggestion IA : 3 objets proches'),h('18/11 19:05','L’habitant revendique 2 objets')]},
+    {id:'D3',ref:'DEM-2026-0421',name:'Inès B.',contact:'06 12 34 56 78',cat:'montre',desc:'Montre argentée avec un bracelet en cuir noir',date:'2026-11-18',line:'Tram T2',status:'veille',claim:[],answer:'',msg:'',
+      hist:[h('19/11 08:30','Demande envoyée'),h('19/11 08:30','Aucun objet correspondant · veille activée')]},
+    {id:'D4',ref:'DEM-2026-0409',name:'Marc P.',contact:'marc.p@exemple.fr',cat:'telephone',desc:'Smartphone noir perdu en rentrant du travail',date:'2026-11-13',line:'Bus 8',status:'verif',claim:['O11'],answer:'Coque bleue avec une photo de mon chien',msg:'',
+      hist:[h('14/11 12:44','Demande envoyée'),h('14/11 12:44','Suggestion IA : 1 objet (93 %)'),h('14/11 12:47','L’habitant revendique 1 objet')]}
+  ];
+  return {objects,demandes,closed:[],mine:[],seq:22,mode:'user'};
+}
+
+/* ===================== État ===================== */
+let S; try{S=JSON.parse(localStorage.getItem('pdv-state-v2')||'null')}catch(e){S=null}
+if(!S||!S.objects) S=seed();
+const UI={cur:null,obj:null,claimOpen:false,rdvDay:OPEN_DAYS[1],rdvTime:null,errs:{},draft:{},found:null,dfilter:'todo',agentD:null,panel:null,ifilter:'',iq:'',openObj:null,guichet:null,check:{},newObj:{},crDay:OPEN_DAYS[0],lookupErr:''};
+function save(){try{localStorage.setItem('pdv-state-v2',JSON.stringify(S))}catch(e){}}
+
+/* ===================== Utilitaires ===================== */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+const D=s=>new Date(s+'T12:00:00');
+const days=(a,b)=>Math.round((D(a)-D(b))/864e5);
+const fd=s=>D(s).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+const fdl=s=>D(s).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+const week=s=>{const d=D(s);const k=(d.getDay()+6)%7;d.setDate(d.getDate()-k);return 'semaine du '+d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})};
+const nowStamp=()=>{const d=new Date();return '20/11 '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
+const obj=id=>S.objects.find(o=>o.id===id);
+const dem=id=>S.demandes.find(d=>d.id===id);
+const deadline=o=>{const d=D(o.date);d.setFullYear(d.getFullYear()+1);d.setDate(d.getDate()+1);return d.toISOString().slice(0,10)};
+const soonExpiring=o=>o.status==='stock'&&days(deadline(o),TODAY)<=14;
+function icon(cat){return `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[cat]||ICONS.autre}</svg>`}
+function tint(color){const c=COLORS[color]||'#98A2A8';return `background:color-mix(in srgb,${c} 22%,var(--surface));color:color-mix(in srgb,${c} 70%,var(--ink))`}
+function linePill(l){if(!l)return '<span class="line none">Ligne ?</span>';const t=l.startsWith('Tram');return `<span class="line ${t?'tram':'bus'}">${t?'T':'B'} · ${esc(l.replace('Tram ','').replace('Bus ',''))}</span>`}
+function badge(map,s){const b=map[s]||{l:s,c:'b-neutral',i:'•'};return `<span class="badge ${b.c}" data-i="${b.i}">${b.l}</span>`}
+function mini(o,fallbackCat,fallbackColor){if(o&&o.photo)return `<span class="ic has-photo"><img src="${o.photo}" alt=""></span>`;const c=o?o.cat:fallbackCat,col=o?o.color:fallbackColor;return `<span class="ic" style="${tint(col)}">${icon(c)}</span>`}
+const dObj=d=>d.validated?obj(d.validated):(d.claim&&d.claim[0]?obj(d.claim[0]):null);
+function thumb(o,{masked=true,pct=null}={}){
+  const inner=o.photo?`<img src="${o.photo}" alt="${masked?'':'Photo de l’objet'}">`:icon(o.cat);
+  return `<div class="thumb ${masked?'masked':''} ${o.photo?'has-photo':''}" style="${tint(o.color)}">${inner}${pct!=null?`<span class="pct">${pct} %</span>`:''}${masked?'<span class="mask">Photo masquée</span>':''}</div>`;
+}
+function detectColor(t){const n=norm(t);let best=null,pos=1e9;for(const [k,ws] of Object.entries(COLOR_WORDS)){for(const w of ws){const m=new RegExp('\\b'+w+'\\b').exec(n);if(m&&m.index<pos){pos=m.index;best=k}}}return best}
+function level(s){return s>=85?['Forte','var(--ok)']:s>=65?['Moyenne','var(--warn)']:['Faible','var(--bad)']}
+let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,3600)}
+
+/* IA simulée : score de ressemblance déterministe */
+function match(d){
+  const color=detectColor(d.desc), txt=norm(d.desc+' '+(d.answer||''));
+  const pool=S.objects.filter(o=>o.cat===d.cat&&(o.status==='stock'||(d.claim||[]).includes(o.id)));
+  return pool.map(o=>{
+    let s=50;const why=[['ok','Même type d’objet']];
+    if(color){if(o.color===color){s+=22;why.push(['ok','Couleur identique ('+o.color+')'])}else{s-=10;why.push(['ko','Couleur différente ('+o.color+' / '+color+')'])}}else why.push(['mid','Couleur non précisée']);
+    if(d.line&&d.line!=='?'){if(o.line===d.line){s+=13;why.push(['ok','Même ligne ('+o.line+')'])}else why.push(['mid','Autre ligne ('+o.line+')'])}
+    const g=days(o.date,d.date);
+    if(g>=0&&g<=4){s+=8;why.push(['ok',g===0?'Trouvé le jour de la perte':'Trouvé '+g+' j après la perte'])}
+    else if(g<0){s-=12;why.push(['mid','Trouvé '+(-g)+' j avant la date de perte déclarée'])}
+    else why.push(['mid','Trouvé '+g+' j après la perte']);
+    const kw=(o.kw||[]).filter(k=>txt.includes(k));
+    if(kw.length){s+=4;why.push(['ok','Détail commun : '+kw.join(', ')])}
+    return {o,s:Math.max(5,Math.min(96,s)),why};
+  }).filter(r=>r.s>=55).sort((a,b)=>b.s-a.s).slice(0,3);
+}
+
+/* ===================== Interface habitant ===================== */
+function uShell(inner){
+  return `<header class="uhead"><div class="in gut">
+    <button class="logo has-img" data-go="accueil" aria-label="Accueil"><img src="img/logo-tpm.png" alt="Métropole Toulon Provence Méditerranée" onerror="this.parentNode.classList.remove('has-img');this.remove()"><span>Logo<br>Métropole</span></button>
+    <button class="brand" data-go="accueil">Perdu <span>de vue</span></button>
+    <button class="btn sec sm" data-go="suivi">Suivre</button>
+  </div></header>
+  <main class="gut"><div class="wrap view">${inner}</div></main>
+  <footer class="ufoot"><div class="in gut"><span>Service de la Métropole · ${esc(HOURS)}</span><span>Accessibilité : partiellement conforme (prototype)</span><span>Données personnelles</span><span>Mentions légales</span></div></footer>`;
+}
+const V={};
+V.accueil=()=>{
+  const back=S.objects.filter(o=>o.status==='restitue').length+37;
+  return uShell(`<div class="stack" style="gap:22px">
+  <section class="split" aria-label="Que voulez-vous faire ?">
+    <div class="half">
+      <span class="eyebrow">Vous avez trouvé un objet</span>
+      <h2>Aidez le propriétaire à retrouver son objet</h2>
+      <p>Signalez-le en une minute, puis déposez-le à la mairie ou remettez-le au conducteur.</p>
+      <button class="bigbtn found" data-go="trouve">J’ai trouvé</button>
+    </div>
+    <div class="half lostside">
+      <span class="eyebrow">Vous avez perdu un objet</span>
+      <h2>On a peut-être ce que vous cherchez</h2>
+      <p>Décrivez votre objet : nous le comparons aux objets trouvés dans les bus et les trams.</p>
+      <button class="bigbtn lost" data-go="perdu">J’ai perdu</button>
+    </div>
+  </section>
+  <div class="notice warn"><span class="ni">!</span><div><b>Papiers d’identité, argent ou carte bancaire ?</b><span class="small">Ces objets sont remis directement à la police. <a href="#police" data-go="police">Voir les démarches</a></span></div></div>
+  <div class="infos">
+    <div class="info-card"><span class="eyebrow">Où récupérer</span><b>Mairie, bureau des objets trouvés</b><span class="small muted">${esc(HOURS)}</span></div>
+    <div class="info-card"><span class="eyebrow">À apporter</span><b>Une pièce d’identité</b><span class="small muted">Et toute preuve utile : photo, facture, numéro de série.</span></div>
+    <div class="info-card"><span class="eyebrow">Ce mois-ci (exemple)</span><span class="counter">${back}</span><span class="small muted">objets rendus à leur propriétaire</span></div>
+  </div>
+  </div>`);
+};
+
+const EXAMPLES={
+  sac:{desc:'Sac à dos bleu marine, avec un porte-clés tortue accroché',date:'2026-11-18',cat:'sac',line:'Tram T1',contact:'lea.m@exemple.fr',name:'Léa M.'},
+  ecouteurs:{desc:'Écouteurs sans fil blancs dans leur boîtier',date:'2026-11-16',cat:'ecouteurs',line:'Bus 8',contact:'lea.m@exemple.fr',name:'Léa M.'},
+  montre:{desc:'Montre argentée, bracelet en cuir noir',date:'2026-11-19',cat:'montre',line:'Tram T2',contact:'lea.m@exemple.fr',name:'Léa M.'}
+};
+V.perdu=()=>{
+  const d=UI.draft,e=UI.errs,sens=d.cat==='sensible';
+  const opt=(arr,v)=>arr.map(([k,l])=>`<option value="${esc(k)}" ${k===v?'selected':''}>${esc(l)}</option>`).join('');
+  return uShell(`<div class="narrow stack">
+  <button class="back" data-go="accueil">← Accueil</button>
+  <div class="stack" style="gap:6px"><h1>Qu’avez-vous perdu ?</h1><p class="muted">Plus votre description est précise, plus la recherche est fiable.</p></div>
+  <div class="row small"><span class="muted">Démo · remplir avec :</span><div class="chips">
+    <button class="chip" data-act="ex" data-v="sac">Sac à dos (2 résultats)</button>
+    <button class="chip" data-act="ex" data-v="ecouteurs">Écouteurs (plusieurs)</button>
+    <button class="chip" data-act="ex" data-v="montre">Montre (aucun)</button></div></div>
+  <form class="card stack" id="f-lost" novalidate>
+    <div class="field"><label for="f-desc">Décrivez votre objet</label>
+      <textarea class="input" id="f-desc" placeholder="Ex. : sac à dos bleu marine, porte-clés en forme de tortue…" ${e.desc?'aria-invalid="true"':''}>${esc(d.desc||'')}</textarea>
+      <span class="hint">Couleur, marque, contenu, signe distinctif. Les détails restent privés.</span>${e.desc?`<span class="err">${e.desc}</span>`:''}</div>
+    <div class="grid2">
+      <div class="field"><label for="f-date">Quand ?</label><input class="input" type="date" id="f-date" max="${TODAY}" value="${esc(d.date||'')}" ${e.date?'aria-invalid="true"':''}>${e.date?`<span class="err">${e.date}</span>`:''}</div>
+      <div class="field"><label for="f-cat">Type d’objet</label><select class="input" id="f-cat" ${e.cat?'aria-invalid="true"':''}><option value="">Choisir…</option>${opt(Object.entries(CATS).map(([k,v])=>[k,v.l]),d.cat)}</select>${e.cat?`<span class="err">${e.cat}</span>`:''}</div>
+      <div class="field"><label for="f-line">Où ?</label><select class="input" id="f-line"><option value="?">Je ne sais pas</option>${opt(LINES.map(l=>[l,l]),d.line)}</select></div>
+      <div class="field"><span class="lab">Photos <span class="muted">(facultatif)</span></span><label class="file" for="f-photo">＋ Ajouter une photo<input type="file" id="f-photo" accept="image/*"></label><span class="hint" id="f-photo-name">${d.photoName?esc(d.photoName):'Une ancienne photo de l’objet ou une facture'}</span></div>
+    </div>
+    ${sens?`<div class="notice bad"><span class="ni">⚑</span><div><b>Cet objet relève de la police</b><span class="small">Les papiers d’identité, l’argent et les cartes bancaires ne passent pas par Perdu de vue.</span></div></div>`:''}
+    <div class="field"><label for="f-mail">Pour vous prévenir</label><input class="input" type="email" id="f-mail" placeholder="E-mail ou téléphone" value="${esc(d.contact||'')}" ${e.contact?'aria-invalid="true"':''}>${e.contact?`<span class="err">${e.contact}</span>`:''}<span class="hint">Utilisé uniquement pour cette demande, puis supprimé.</span></div>
+    ${sens?`<button type="button" class="btn block" data-go="police">Voir les démarches police →</button>`:`<button class="btn block" type="submit">Lancer la recherche ↗</button>`}
+  </form></div>`);
+};
+
+V.resultats=()=>{
+  const d=dem(UI.cur); if(!d) return V.accueil();
+  const r=match(d).filter(x=>x.o.status==='stock'||d.claim.includes(x.o.id));
+  if(!r.length) return uShell(`<div class="narrow stack">
+    <button class="back" data-go="perdu">← Modifier ma description</button>
+    <h1>Aucun objet ne correspond pour l’instant</h1>
+    <div class="notice info"><span class="ni">i</span><div><b>Nous gardons votre demande en veille</b><span class="small">Les objets arrivent souvent 2 à 3 jours après la perte. Dès qu’un objet ressemblant est enregistré, vous êtes prévenu·e par e-mail ou SMS.</span></div></div>
+    <div class="card stack"><span class="eyebrow">Votre référence</span><span class="mono" style="font-size:1.2rem">${esc(d.ref)}</span><span class="small muted">Elle vous permet de suivre votre demande avec le bouton « Suivre ».</span>
+    <button class="btn" data-act="openSuivi" data-v="${d.id}">Suivre ma demande</button></div></div>`);
+  const several=r.length>1;
+  return uShell(`<div class="stack">
+    <button class="back" data-go="perdu">← Modifier ma description</button>
+    <div class="stack" style="gap:6px"><h1>${r.length} objet${several?'s':''} correspondant${several?'s':''}</h1>
+    <p class="muted">Ressemblance estimée par l’IA à partir de votre description. Ouvrez une fiche pour la consulter.</p></div>
+    ${r.length>2?`<div class="notice warn"><span class="ni">?</span><div><b>Plusieurs objets se ressemblent</b><span class="small">Ouvrez la fiche de celui qui vous semble le plus proche : un agent comparera ensuite avec vos informations.</span></div></div>`:''}
+    <div class="results">${r.map(x=>`<button class="ocard" data-act="openObj" data-v="${x.o.id}" aria-label="Voir la fiche : ${esc(CATS[x.o.cat].l)}, ${x.s} %">
+      ${thumb(x.o,{pct:x.s})}
+      <div class="obar"><span class="t">${esc(CATS[x.o.cat].l)}</span>${linePill(x.o.line)}<span class="eye">${EYE}</span></div></button>`).join('')}</div>
+    <div class="notice info"><span class="ni">i</span><div><b>Un agent vérifie toujours avant de rendre un objet</b><span class="small">L’IA propose des objets ressemblants, mais seul un agent peut valider une restitution.</span></div></div>
+    <button class="btn sec" data-act="noneMine">Aucun n’est le mien · garder ma demande en veille</button>
+  </div>`);
+};
+
+V.objet=()=>{
+  const d=dem(UI.cur),o=obj(UI.obj); if(!d||!o) return V.accueil();
+  const sc=(match(d).find(x=>x.o.id===o.id)||{s:0}).s;
+  const claimed=d.claim.includes(o.id)&&d.status!=='resultats';
+  return uShell(`<div class="stack">
+  <button class="back" data-go="resultats">← Retour aux résultats</button>
+  <div class="fiche">
+    ${thumb(o,{pct:sc})}
+    <div class="card stack">
+      <span class="eyebrow">Fiche objet · <span class="mono">${esc(o.ref)}</span></span>
+      <h1>${esc(CATS[o.cat].l)}</h1>
+      <dl class="kv">
+        <dt>Couleur</dt><dd><span class="swatch" style="background:${COLORS[o.color]}"></span> ${esc(o.color)}</dd>
+        <dt>Trouvé dans</dt><dd>${linePill(o.line)}</dd>
+        <dt>Période</dt><dd>${esc(week(o.date))}</dd>
+        <dt>Conservé à</dt><dd>la mairie</dd>
+      </dl>
+      <div class="stack" style="gap:6px"><div class="row" style="justify-content:space-between"><span class="small muted">Ressemblance estimée</span><b>${sc} %</b></div><div class="meter"><i style="width:${sc}%"></i></div></div>
+      <p class="small muted">Marque, contenu et signes distinctifs sont volontairement masqués : ils servent à vérifier que l’objet est bien le vôtre.</p>
+      ${claimed?`<div class="notice ok"><span class="ni">✓</span><div><b>Vous avez déjà revendiqué cet objet</b><span class="small">Un agent vérifie votre demande.</span></div></div>`
+      :!UI.claimOpen?`<button class="btn claimbtn" data-act="claimOpen">Cet objet peut être le mien</button>`
+      :`<form class="stack" id="f-claim" novalidate>
+        <div class="notice info"><span class="ni">?</span><div><b>Une question pour vérifier</b><span class="small">${esc(o.q)}</span></div></div>
+        <div class="field"><label for="f-ans">Votre réponse</label><input class="input" id="f-ans" placeholder="Votre réponse" ${UI.errs.ans?'aria-invalid="true"':''}>${UI.errs.ans?`<span class="err">${UI.errs.ans}</span>`:''}</div>
+        <div class="field"><span class="lab">Preuve <span class="muted">(facultatif)</span></span><label class="file" for="f-proof">＋ Photo, facture ou n° de série<input type="file" id="f-proof" accept="image/*,.pdf"></label></div>
+        <button class="btn" type="submit">Envoyer à un agent</button>
+        <button class="btn ghost" type="button" data-act="claimClose">Annuler</button>
+      </form>`}
+    </div>
+  </div></div>`);
+};
+
+function timeline(d){
+  const steps=['Demande envoyée','Vérification par un agent','Correspondance validée','Rendez-vous','Objet restitué'];
+  const pos={resultats:0,veille:0,verif:1,precision:1,refusee:1,validee:2,rdv:3,restituee:5}[d.status]??0;
+  return `<ol class="tl">${steps.map((s,i)=>`<li class="${i<pos?'done':i===pos?'now':''}"><span class="dot">${i<pos?'✓':i+1}</span><div><b>${s}</b>${i===pos&&d.status!=='restituee'?`<div class="small muted">${statusHint(d)}</div>`:''}</div></li>`).join('')}</ol>`;
+}
+function statusHint(d){
+  return {resultats:'Des objets ressemblants vous sont proposés.',veille:'Aucun objet pour l’instant : nous vous prévenons dès qu’un objet correspond.',verif:'Un agent compare votre description avec l’objet (sous 2 jours ouvrés).',precision:'L’agent a besoin d’une précision.',refusee:'Nous n’avons pas pu confirmer.',validee:'Choisissez un créneau pour venir le récupérer.',rdv:'Présentez-vous à la mairie avec une pièce d’identité.'}[d.status]||'';
+}
+V.suivi=()=>{
+  const mine=S.mine.map(dem).filter(Boolean);
+  const d=dem(UI.cur);
+  let detail='';
+  if(d){
+    const o=d.validated?obj(d.validated):null;
+    let act='';
+    if(d.status==='resultats') act=`<button class="btn" data-go="resultats">Voir les objets proposés</button>`;
+    if(d.status==='veille') act=`<div class="notice info"><span class="ni">◌</span><div><b>Veille active</b><span class="small">Nous comparons chaque nouvel objet enregistré avec votre description pendant 30 jours.</span></div></div>`;
+    if(d.status==='verif') act=`<div class="notice warn"><span class="ni">!</span><div><b>Vérification en cours</b><span class="small">Aucun rendez-vous n’est possible tant qu’un agent n’a pas confirmé la correspondance.</span></div></div>`;
+    if(d.status==='precision'||d.status==='refusee') act=`<div class="notice ${d.status==='refusee'?'bad':'warn'}"><span class="ni">${d.status==='refusee'?'✕':'?'}</span><div><b>${d.status==='refusee'?'Nous n’avons pas pu confirmer que cet objet vous appartient':'L’agent vous demande une précision'}</b><span class="small">${esc(d.msg)}</span></div></div>
+      <form class="stack" id="f-prec" novalidate><div class="field"><label for="f-precision">${d.status==='refusee'?'Ajouter une preuve ou une précision':'Votre réponse'}</label><textarea class="input" id="f-precision" placeholder="Ex. : il y a une rayure sous le boîtier, j’ai la facture…"></textarea></div>
+      <button class="btn" type="submit">Envoyer</button></form>`;
+    if(d.status==='validee') act=`<div class="notice ok"><span class="ni">✓</span><div><b>C’est confirmé, votre objet vous attend</b><span class="small">Choisissez un créneau pour venir le récupérer à la mairie.</span></div></div><button class="btn" data-go="rdv">Prendre rendez-vous</button>`;
+    if(d.status==='rdv') act=`<div class="ticket"><span class="eyebrow">Votre rendez-vous</span><b style="font-size:1.15rem;text-transform:capitalize">${esc(fdl(d.rdv.day))} · ${esc(d.rdv.time)}</b><span class="code">${esc(d.rdv.code)}</span><span class="small">${esc(ADDRESS)}<br><b>Pensez à votre pièce d’identité.</b> Sans elle, l’objet ne pourra pas vous être remis.</span></div>
+      <div class="row"><button class="btn sec" data-go="rdv">Modifier</button><button class="btn bad" data-act="cancelRdv">Annuler le rendez-vous</button></div>`;
+    if(d.status==='restituee') act=`<div class="notice ok"><span class="ni">✓</span><div><b>Objet restitué</b><span class="small">Merci d’avoir utilisé Perdu de vue. Vos données seront supprimées automatiquement.</span></div></div>`;
+    detail=`<div class="card stack">
+      <div class="row" style="justify-content:space-between"><span class="mono">${esc(d.ref)}</span>${badge(DST,d.status)}</div>
+      <div class="row" style="gap:12px;flex-wrap:nowrap"><div style="width:56px;flex:none">${thumb(o||{cat:d.cat,color:detectColor(d.desc)},{masked:true})}</div><div style="min-width:0"><b>${esc(CATS[d.cat].l)}</b><div class="small muted">${esc(d.desc)}</div></div></div>
+      ${timeline(d)}${act}
+      ${!['restituee','annulee'].includes(d.status)?`<button class="btn ghost sm" data-act="cancelDem" style="align-self:flex-start">Annuler ma demande</button>`:''}
+    </div>`;
+  }
+  return uShell(`<div class="narrow stack">
+    <button class="back" data-go="accueil">← Accueil</button>
+    <h1>Suivre ma demande</h1>
+    <form class="row" id="f-lookup" novalidate style="flex-wrap:nowrap"><label for="f-ref" class="sr">Référence de la demande</label><input class="input" id="f-ref" placeholder="Référence, ex. DEM-2026-0412" style="flex:1;min-width:0"><button class="btn" type="submit">Voir</button></form>
+    ${UI.lookupErr?`<span class="err">${UI.lookupErr}</span>`:''}
+    ${mine.length?`<div class="stack" style="gap:8px"><span class="eyebrow">Mes demandes sur cet appareil</span><div class="dlist">${mine.map(m=>`<button class="ditem" data-act="openSuivi" data-v="${m.id}" aria-current="${m.id===UI.cur}">${mini(m.validated?obj(m.validated):null,m.cat,detectColor(m.desc))}<span class="tx"><b>${esc(CATS[m.cat].l)}</b><span class="mono muted">${esc(m.ref)}</span></span>${badge(DST,m.status)}</button>`).join('')}</div></div>`
+      :`<p class="small muted">Démo : essayez la référence <span class="mono">DEM-2026-0412</span> (rendez-vous fixé).</p>`}
+    ${detail}
+  </div>`);
+};
+
+function bookedMap(){const m={};S.demandes.forEach(d=>{if(d.status==='rdv'&&d.rdv)m[d.rdv.day+' '+d.rdv.time]=d});return m}
+function isTaken(day,t){const i=TIMES.indexOf(t);return (i*7+day.charCodeAt(9))%5===0}
+V.rdv=()=>{
+  const d=dem(UI.cur); if(!d||!['validee','rdv'].includes(d.status)) return V.suivi();
+  const bm=bookedMap();
+  const days_=OPEN_DAYS.filter(x=>x>TODAY);
+  if(!days_.includes(UI.rdvDay)) UI.rdvDay=days_[0];
+  return uShell(`<div class="narrow stack">
+    <button class="back" data-go="suivi">← Ma demande</button>
+    <div class="stack" style="gap:6px"><h1>Choisissez un créneau</h1><p class="muted">${esc(ADDRESS)} · 10 minutes suffisent.</p></div>
+    <div class="days" role="group" aria-label="Jour">${days_.map(x=>{const dd=D(x);return `<button class="day" data-act="rdvDay" data-v="${x}" aria-pressed="${x===UI.rdvDay}"><span class="small">${dd.toLocaleDateString('fr-FR',{weekday:'short'})}</span><b>${dd.getDate()}</b><span class="small">${dd.toLocaleDateString('fr-FR',{month:'short'})}</span></button>`}).join('')}</div>
+    <div class="slots" role="group" aria-label="Heure">${TIMES.map(t=>{const k=UI.rdvDay+' '+t;const busy=(bm[k]&&bm[k].id!==d.id)||isTaken(UI.rdvDay,t)||S.closed.includes(k);return `<button class="slot" data-act="rdvTime" data-v="${t}" ${busy?'disabled aria-label="'+t+' indisponible"':''} aria-pressed="${t===UI.rdvTime}">${t}</button>`}).join('')}</div>
+    <div class="notice info"><span class="ni">i</span><div><b>À apporter</b><span class="small">Une pièce d’identité à votre nom et, si possible, la preuve indiquée dans votre demande.</span></div></div>
+    <button class="btn block" data-act="rdvConfirm" ${UI.rdvTime?'':'disabled'}>${UI.rdvTime?`Confirmer le ${esc(fd(UI.rdvDay))} à ${UI.rdvTime}`:'Choisissez une heure'}</button>
+  </div>`);
+};
+
+V.trouve=()=>{
+  if(UI.found) return uShell(`<div class="narrow stack">
+    <h1>Merci pour votre geste !</h1>
+    <div class="ticket"><span class="eyebrow">Numéro de signalement</span><span class="code">${esc(UI.found.ref)}</span>
+    <span class="small">${UI.found.cat==='sensible'?'Cet objet doit être déposé <b>au commissariat</b>.':`Déposez l’objet à la mairie : ${esc(HOURS.replace(', sur rendez-vous',''))}. Indiquez ce numéro au guichet.`}</span></div>
+    <button class="btn sec" data-act="foundNew">Signaler un autre objet</button><button class="btn ghost" data-go="accueil">Retour à l’accueil</button></div>`);
+  return uShell(`<div class="narrow stack">
+    <button class="back" data-go="accueil">← Accueil</button>
+    <h1>Vous avez trouvé un objet</h1>
+    <div class="notice ok"><span class="ni">↯</span><div><b>Vous êtes encore dans le bus ou le tram ?</b><span class="small">Le plus simple : remettez l’objet au conducteur. Il sera transmis au bureau des objets trouvés.</span></div></div>
+    <form class="card stack" id="f-found" novalidate>
+      <div class="grid2">
+        <div class="field"><label for="g-cat">Type d’objet</label><select class="input" id="g-cat" required><option value="">Choisir…</option>${Object.entries(CATS).map(([k,v])=>`<option value="${k}">${esc(v.l)}</option>`).join('')}</select></div>
+        <div class="field"><label for="g-line">Où ?</label><select class="input" id="g-line">${LINES.map(l=>`<option>${l}</option>`).join('')}</select></div>
+        <div class="field"><label for="g-date">Quand ?</label><input class="input" type="date" id="g-date" value="${TODAY}" max="${TODAY}"></div>
+        <div class="field"><span class="lab">Photo <span class="muted">(facultatif)</span></span><label class="file" for="g-photo">＋ Ajouter une photo<input type="file" id="g-photo" accept="image/*"></label></div>
+      </div>
+      <div class="field"><label for="g-desc">Description courte</label><input class="input" id="g-desc" placeholder="Ex. : parapluie noir à poignée en bois"></div>
+      ${UI.errs.g?`<span class="err">${UI.errs.g}</span>`:''}
+      <button class="btn block sun" type="submit">Signaler l’objet</button>
+    </form></div>`);
+};
+
+V.police=()=>uShell(`<div class="narrow stack">
+  <button class="back" data-go="accueil">← Accueil</button>
+  <h1>Papiers, argent ou carte bancaire</h1>
+  <div class="notice bad"><span class="ni">⚑</span><div><b>Ces objets ne passent pas par Perdu de vue</b><span class="small">Pour des raisons de sécurité, ils sont remis directement à la police.</span></div></div>
+  <div class="card stack">
+    <h3>Vous avez perdu…</h3>
+    <ul class="stack" style="gap:8px;padding-left:18px;margin:0">
+      <li><b>Une carte bancaire :</b> faites opposition immédiatement auprès de votre banque.</li>
+      <li><b>Une pièce d’identité :</b> déclarez la perte au commissariat ou en ligne lors de la demande de renouvellement.</li>
+      <li><b>De l’argent ou un portefeuille :</b> renseignez-vous auprès du commissariat de secteur.</li>
+    </ul>
+    <h3>Vous avez trouvé l’un de ces objets</h3>
+    <p>Déposez-le au commissariat le plus proche, ou remettez-le au conducteur du bus ou du tram.</p>
+    <p class="small muted">Adresse et horaires du commissariat : à fournir par la Métropole.</p>
+  </div></div>`);
+
+/* ===================== Interface agent ===================== */
+const NAV=[['agent','Tableau de bord','Accueil','<path d="M4 11 12 4l8 7v8a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1z"/>'],['agent-demandes','Demandes','Demandes','<path d="M5 4h14v12H9l-4 4z"/><path d="M9 9h6M9 12h4"/>'],['agent-inventaire','Inventaire','Stock','<path d="M3 7l9-4 9 4-9 4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/>'],['agent-guichet','Guichet','Guichet','<rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M2 9h20M7 9V5h10v4M10 14h4"/>'],['agent-creneaux','Créneaux','Créneaux','<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>']];
+function aShell(route,inner){
+  const todo=S.demandes.filter(d=>d.status==='verif').length;
+  return `<div class="agent"><aside class="side"><div class="in gut">
+    <div class="top"><img class="alogo" src="img/logo-tpm.png" alt="Métropole TPM" onerror="this.remove()"><div class="t">Perdu de vue<small>Espace agents · Métropole</small></div></div>
+    <nav class="nav" aria-label="Espace agents">${NAV.map(([k,l,sh,ic])=>`<button data-go="${k}" ${route.startsWith(k)&&(k!=='agent'||route==='agent')?'aria-current="page"':''}><svg viewBox="0 0 24 24" aria-hidden="true">${ic}</svg><span class="long">${l}</span><span class="short">${sh}</span>${k==='agent-demandes'&&todo?`<span class="n">${todo}</span>`:''}</button>`).join('')}</nav>
+    <div class="who"><i>SM</i><div>Sophie M.<br><span>Agente · bureau central</span></div></div>
+  </div></aside><main class="amain gut"><div class="in view">${inner}</div></main></div>`;
+}
+V.agent=()=>{
+  const verif=S.demandes.filter(d=>d.status==='verif');
+  const today=S.demandes.filter(d=>d.status==='rdv'&&d.rdv.day===TODAY);
+  const veille=S.demandes.filter(d=>d.status==='veille');
+  const stock=S.objects.filter(o=>['stock','correspondance','rdv'].includes(o.status));
+  const exp=S.objects.filter(soonExpiring);
+  return aShell('agent',`
+    <div class="stack" style="gap:4px"><span class="eyebrow" style="text-transform:none;letter-spacing:0">${esc(fdl(TODAY))}</span><h1>Bonjour Sophie</h1></div>
+    <div class="kpis">
+      <button class="kpi ${verif.length?'hot':''}" data-act="dfilter" data-v="todo"><b>${verif.length}</b><span>Demandes à vérifier</span></button>
+      <button class="kpi" data-go="agent-guichet"><b>${today.length}</b><span>RDV aujourd’hui</span></button>
+      <button class="kpi" data-act="dfilter" data-v="veille"><b>${veille.length}</b><span>Demandes en veille</span></button>
+      <button class="kpi" data-go="agent-inventaire"><b>${stock.length}</b><span>Objets en stock</span></button>
+      <button class="kpi ${exp.length?'hot':''}" data-act="ifilter" data-v="echeance"><b>${exp.length}</b><span>Échéance &lt; 14 jours</span></button>
+    </div>
+    <section class="panel"><div class="panel-h"><h2>À traiter en priorité</h2></div><div class="list">
+      ${verif.map(d=>{const r=match(d);return `<button class="li" data-act="openDem" data-v="${d.id}">${mini(dObj(d),d.cat,detectColor(d.desc))}<span class="tx"><b>${esc(d.name)} · ${esc(CATS[d.cat].l)}</b><span class="small muted">${r.length>1?'Plusieurs objets proches · question de contrôle conseillée':'Revendication à vérifier'}</span></span><span class="meta">${badge(DST,d.status)}<span class="small muted">${r[0]?r[0].s+' %':''}</span></span></button>`}).join('')}
+      ${today.map(d=>`<button class="li" data-act="openGuichet" data-v="${d.id}">${mini(dObj(d),d.cat,'bleu')}<span class="tx"><b>${esc(d.rdv.time)} · ${esc(d.name)}</b><span class="small muted">Restitution au guichet · ${esc(obj(d.validated).ref)} · étagère ${esc(obj(d.validated).shelf)}</span></span><span class="meta">${badge(DST,'rdv')}</span></button>`).join('')}
+      ${exp.map(o=>`<button class="li" data-act="openObjA" data-v="${o.id}">${mini(o)}<span class="tx"><b>${esc(o.title)}</b><span class="small muted">Fin de conservation le ${esc(fd(deadline(o)))} · don ou destruction à décider</span></span><span class="meta"><span class="badge b-warn" data-i="⌛">Échéance</span></span></button>`).join('')}
+      ${!verif.length&&!today.length&&!exp.length?'<p class="muted">Rien d’urgent. Bonne journée !</p>':''}
+    </div></section>
+    <section class="panel"><div class="panel-h"><h2>Ce mois-ci</h2><span class="small muted">Données d’exemple</span></div>
+      <div class="grid2"><div class="stack" style="gap:6px"><span class="small muted">Taux de restitution (bus et tram)</span><div class="row"><b class="counter">41 %</b><span class="small muted">objectif 45 % · avant le service : &lt; 33 %</span></div><div class="meter"><i style="width:41%"></i></div></div>
+      <div class="stack" style="gap:6px"><span class="small muted">Temps moyen d’enregistrement</span><div class="row"><b class="counter">52 s</b><span class="small muted">objectif &lt; 1 min</span></div><div class="meter"><i style="width:87%;background:var(--ok)"></i></div></div></div>
+    </section>
+    <button class="btn sun fab" data-go="agent-nouvel-objet">＋ Enregistrer un objet</button>`);
+};
+
+V['agent-demandes']=()=>{
+  const F={todo:['À vérifier',d=>d.status==='verif'],prec:['Précision',d=>d.status==='precision'],veille:['En veille',d=>['veille','resultats'].includes(d.status)],ok:['Validées / RDV',d=>['validee','rdv'].includes(d.status)],closed:['Clôturées',d=>['restituee','refusee','annulee'].includes(d.status)],all:['Toutes',()=>true]};
+  const f=F[UI.dfilter]||F.all;const list=S.demandes.filter(f[1]);
+  return aShell('agent-demandes',`<div class="panel-h"><h1>Demandes des habitants</h1></div>
+    <div class="filters" role="group" aria-label="Filtrer">${Object.entries(F).map(([k,[l,fn]])=>`<button class="chip" data-act="dfilter" data-v="${k}" aria-pressed="${k===UI.dfilter}">${l} · ${S.demandes.filter(fn).length}</button>`).join('')}</div>
+    <section class="panel"><div class="list">${list.length?list.map(d=>{const r=match(d);return `<button class="li" data-act="openDem" data-v="${d.id}">${mini(dObj(d),d.cat,detectColor(d.desc))}<span class="tx"><b>${esc(d.name)} · ${esc(CATS[d.cat].l)}</b><span class="small muted"><span class="mono">${esc(d.ref)}</span> · perdu le ${esc(fd(d.date))} · ${esc(d.line==='?'?'ligne inconnue':d.line)}</span></span><span class="meta">${badge(DST,d.status)}<span class="small muted">${r.length?'IA : '+r.length+' objet'+(r.length>1?'s':'')+' · '+r[0].s+' %':'IA : aucun objet'}</span></span></button>`}).join(''):'<p class="muted">Aucune demande dans cette catégorie.</p>'}</div></section>`);
+};
+
+V['agent-demande']=()=>{
+  const d=dem(UI.agentD); if(!d) return V['agent-demandes']();
+  const r=match(d);
+  const close=r.length>1&&r[0].s-r[1].s<15;
+  const open=['verif','resultats','veille','precision'].includes(d.status);
+  const p=UI.panel;
+  return aShell('agent-demandes',`
+    <button class="back" data-go="agent-demandes">← Demandes</button>
+    <div class="panel-h"><div class="stack" style="gap:4px"><span class="mono muted">${esc(d.ref)}</span><h1>${esc(d.name)} · ${esc(CATS[d.cat].l)}</h1></div>${badge(DST,d.status)}</div>
+    <div class="cmp">
+      <section class="panel"><h2>Déclaration de l’habitant</h2>
+        <p>« ${esc(d.desc)} »</p>
+        <dl class="kv"><dt>Perdu le</dt><dd>${esc(fdl(d.date))}</dd><dt>Ligne</dt><dd>${linePill(d.line==='?'?null:d.line)}</dd><dt>Contact</dt><dd>${esc(d.contact)}</dd></dl>
+        ${d.answer?`<div class="private"><span class="eyebrow">Réponse à la question de contrôle</span><b>« ${esc(d.answer)} »</b></div>`:''}
+        ${d.claim.length?`<p class="small"><b>Objet(s) revendiqué(s) :</b> ${d.claim.map(id=>`<span class="mono">${esc(obj(id).ref)}</span>`).join(', ')}</p>`:''}
+        <div class="stack" style="gap:8px"><span class="eyebrow">Historique</span><ul class="hist">${d.hist.map(x=>`<li><time>${esc(x.t)}</time><span>${esc(x.x)}</span></li>`).join('')}</ul></div>
+      </section>
+      <section class="panel"><div class="panel-h"><h2>Suggestions de l’IA</h2><span class="ai-tag">✦ Simulée</span></div>
+        <p class="small muted">Suggestion automatique, à vérifier. Seul un agent peut valider une restitution.</p>
+        ${close?`<div class="notice warn"><span class="ni">?</span><div><b>Plusieurs objets proches : l’IA ne peut pas trancher</b><span class="small">Comparez la réponse de l’habitant aux détails privés, ou demandez une précision.</span></div></div>`:''}
+        ${!r.length?`<div class="notice info"><span class="ni">◌</span><div><b>Aucun objet en stock ne correspond</b><span class="small">La demande reste en veille : chaque nouvel objet enregistré est comparé automatiquement.</span></div></div>`:''}
+        ${r.map(x=>{const [lv,lc]=level(x.s);const cl=d.claim.includes(x.o.id);return `<article class="cand ${cl?'claimed':''}">
+          <div class="cand-h">${thumb(x.o,{masked:false})}<div style="min-width:0;flex:1"><b>${esc(x.o.title)}</b><div class="small muted"><span class="mono">${esc(x.o.ref)}</span> · étagère ${esc(x.o.shelf)} · ${esc(fd(x.o.date))}</div>${cl?'<span class="badge b-info" data-i="★">Revendiqué par l’habitant</span>':''}</div>
+          <div style="text-align:right"><b style="font-size:1.3rem;font-variant-numeric:tabular-nums">${x.s} %</b><div class="small" style="color:${lc};font-weight:700">${lv}</div></div></div>
+          <ul class="why">${x.why.map(([k,t])=>`<li><span class="k ${k}">${k==='ok'?'✓':k==='mid'?'≈':'✕'}</span>${esc(t)}</li>`).join('')}</ul>
+          <div class="private"><span class="eyebrow">🔒 Détails privés · jamais publiés</span><span><b>Marque :</b> ${esc(x.o.brand)}</span><span><b>Signe distinctif :</b> ${esc(x.o.priv)}</span><span><b>Question :</b> ${esc(x.o.q)} · <b>Réponse attendue :</b> ${esc(x.o.a)}</span></div>
+          ${open?`<button class="btn ok sm" data-act="validate" data-v="${x.o.id}">Valider cet objet</button>`:''}
+        </article>`}).join('')}
+      </section>
+    </div>
+    ${open?`<section class="panel"><h2>Décision de l’agent</h2>
+      ${p?`<form class="stack" id="f-agent" novalidate><div class="field"><label for="a-msg">${p==='precision'?'Message envoyé à l’habitant':'Motif (communiqué à l’habitant)'}</label><textarea class="input" id="a-msg">${p==='precision'?'Bonjour, pour vérifier, pouvez-vous nous indiquer un détail visible uniquement sur votre objet (inscription, rayure, contenu) ?':'Les éléments fournis ne correspondent pas aux caractéristiques de l’objet. Vous pouvez ajouter une preuve (photo, facture, numéro de série).'}</textarea></div>
+        <div class="row"><button class="btn ${p==='refus'?'bad':''}" type="submit">${p==='precision'?'Envoyer la demande de précision':'Confirmer le refus'}</button><button class="btn ghost" type="button" data-act="panel" data-v="">Annuler</button></div></form>`
+      :`<div class="row"><button class="btn sec" data-act="panel" data-v="precision">Demander une précision</button><button class="btn bad" data-act="panel" data-v="refus">Ne peut pas être confirmée</button></div>`}
+    </section>`:''}`);
+};
+
+V['agent-inventaire']=()=>{
+  const q=norm(UI.iq);
+  let list=S.objects.filter(o=>!q||norm(o.title+' '+o.ref+' '+o.line+' '+CATS[o.cat].l+' '+o.color+' '+o.priv).includes(q));
+  if(UI.ifilter==='echeance') list=list.filter(soonExpiring); else if(UI.ifilter) list=list.filter(o=>o.status===UI.ifilter);
+  list=list.slice().sort((a,b)=>b.date.localeCompare(a.date));
+  return aShell('agent-inventaire',`<div class="panel-h"><h1>Inventaire</h1><button class="btn sun" data-go="agent-nouvel-objet">＋ Enregistrer un objet</button></div>
+    <div class="grid2"><div class="field"><label for="i-q" class="sr">Rechercher</label><input class="input" id="i-q" placeholder="Rechercher : référence, couleur, ligne, détail…" value="${esc(UI.iq)}"></div>
+    <div class="field"><label for="i-f" class="sr">Statut</label><select class="input" id="i-f"><option value="">Tous les statuts</option>${Object.entries(OST).map(([k,v])=>`<option value="${k}" ${UI.ifilter===k?'selected':''}>${v.l}</option>`).join('')}<option value="echeance" ${UI.ifilter==='echeance'?'selected':''}>Échéance proche</option></select></div></div>
+    <section class="panel"><span class="small muted">${list.length} objet${list.length>1?'s':''} · reprise du fichier Excel : 300 fiches prévues au lancement</span><div class="list">${list.map(o=>`<button class="li" data-act="openObjA" data-v="${o.id}" aria-expanded="${UI.openObj===o.id}">${mini(o)}<span class="tx"><b>${esc(o.title)}</b><span class="small muted"><span class="mono">${esc(o.ref)}</span> · ${esc(fd(o.date))} · étagère ${esc(o.shelf)}</span></span><span class="meta">${badge(OST,o.status)}${soonExpiring(o)?'<span class="badge b-warn" data-i="⌛">Échéance</span>':linePill(o.line)}</span></button>
+      ${UI.openObj===o.id?`<div class="private" style="margin:0 0 12px">${o.photo?`<img src="${o.photo}" alt="" style="max-width:180px;border-radius:10px">`:''}<span><b>Catégorie :</b> ${esc(CATS[o.cat].l)} · <b>Couleur :</b> ${esc(o.color)} · <b>Ligne :</b> ${esc(o.line)}</span><span><b>Marque :</b> ${esc(o.brand)} · <b>Signe distinctif :</b> ${esc(o.priv)}</span><span><b>Question de contrôle :</b> ${esc(o.q)} → ${esc(o.a)}</span><span><b>Enregistré par</b> ${esc(o.agent)} · conservation jusqu’au ${esc(fd(deadline(o)))} ${D(deadline(o)).getFullYear()}</span></div>`:''}`).join('')||'<p class="muted">Aucun objet.</p>'}</div></section>`);
+};
+
+const AI_SAMPLES={montre:{cat:'montre',color:'argent',title:'Montre argentée, bracelet cuir',brand:'Festina',priv:'Bracelet en cuir noir, initiales « I.B. » gravées au dos',q:'Y a-t-il une inscription au dos ?',a:'Les initiales I.B.',kw:['initiales','cuir'],photo:'img/s-montre.jpg'},
+  parapluie:{cat:'parapluie',color:'noir',title:'Parapluie pliant noir',brand:'Sans marque',priv:'Baleine tordue',q:'Le parapluie a-t-il un défaut ?',a:'Une baleine tordue',kw:['baleine'],photo:'img/o7.jpg'},
+  cles:{cat:'cles',color:'gris',title:'Clé de voiture',brand:'Peugeot',priv:'Porte-clés en cuir marron',q:'Comment est le porte-clés ?',a:'En cuir marron',kw:['cuir'],photo:'img/s-cles.jpg'}};
+V['agent-nouvel-objet']=()=>{
+  const n=UI.newObj;
+  return aShell('agent-inventaire',`<button class="back" data-go="agent-inventaire">← Inventaire</button>
+    <div class="stack" style="gap:4px"><h1>Enregistrer un objet</h1><p class="muted">Prenez une photo : l’IA pré-remplit le type et la couleur. Vérifiez puis enregistrez.</p></div>
+    <div class="cmp">
+      <section class="panel">
+        <div class="preview">${n.photo?`<img src="${n.photo}" alt="Photo de l’objet">`:n.cat?`<div style="${tint(n.color)};width:100%;height:100%;display:grid;place-items:center">${icon(n.cat)}</div>`:'<span>Aucune photo</span>'}</div>
+        <label class="file" for="n-photo">📷 Prendre ou choisir une photo<input type="file" id="n-photo" accept="image/*" capture="environment"></label>
+        <div class="row small"><span class="muted">Démo · photo d’exemple :</span><div class="chips">${Object.keys(AI_SAMPLES).map(k=>`<button class="chip" data-act="sample" data-v="${k}">${esc(AI_SAMPLES[k].title.split(',')[0])}</button>`).join('')}</div></div>
+        ${n.analyzing?'<span class="ai-tag">✦ Analyse de la photo…</span>':n.ai?'<span class="ai-tag">✦ Pré-rempli par l’IA (simulée) · à vérifier</span>':''}
+      </section>
+      <form class="panel" id="f-new" novalidate>
+        <div class="grid2">
+          <div class="field"><label for="n-cat">Type</label><select class="input" id="n-cat"><option value="">Choisir…</option>${Object.entries(CATS).map(([k,v])=>`<option value="${k}" ${n.cat===k?'selected':''}>${esc(v.l)}</option>`).join('')}</select></div>
+          <div class="field"><label for="n-color">Couleur</label><select class="input" id="n-color"><option value="">Choisir…</option>${Object.keys(COLORS).map(k=>`<option ${n.color===k?'selected':''}>${k}</option>`).join('')}</select></div>
+          <div class="field"><label for="n-line">Ligne</label><select class="input" id="n-line">${LINES.map(l=>`<option ${n.line===l?'selected':''}>${l}</option>`).join('')}</select></div>
+          <div class="field"><label for="n-date">Trouvé le</label><input class="input" type="date" id="n-date" value="${esc(n.date||TODAY)}" max="${TODAY}"></div>
+        </div>
+        <div class="field"><label for="n-title">Description interne</label><input class="input" id="n-title" value="${esc(n.title||'')}" placeholder="Ex. : montre argentée, bracelet cuir"></div>
+        <div class="grid2"><div class="field"><label for="n-brand">Marque</label><input class="input" id="n-brand" value="${esc(n.brand||'')}"></div><div class="field"><label for="n-shelf">Emplacement</label><input class="input" id="n-shelf" value="${esc(n.shelf||'A2')}"></div></div>
+        <div class="private"><span class="eyebrow">🔒 Privé · sert à vérifier le propriétaire</span>
+          <div class="field"><label for="n-priv">Signe distinctif / contenu</label><input class="input" id="n-priv" value="${esc(n.priv||'')}"></div>
+          <div class="grid2"><div class="field"><label for="n-q">Question de contrôle</label><input class="input" id="n-q" value="${esc(n.q||'')}"></div><div class="field"><label for="n-a">Réponse attendue</label><input class="input" id="n-a" value="${esc(n.a||'')}"></div></div>
+        </div>
+        <label class="check" for="n-sens"><input type="checkbox" id="n-sens" ${n.cat==='sensible'?'checked':''}><span><b>Papiers, argent ou carte bancaire</b><br><span class="small muted">L’objet est transmis à la police et n’est jamais publié.</span></span></label>
+        ${UI.errs.n?`<span class="err">${UI.errs.n}</span>`:''}
+        <div class="row"><button class="btn" type="submit" data-next="0">Enregistrer</button><button class="btn sec" type="submit" data-next="1">Enregistrer et suivant</button></div>
+      </form>
+    </div>`);
+};
+
+V['agent-guichet']=()=>{
+  const rdvs=S.demandes.filter(d=>d.status==='rdv').sort((a,b)=>(a.rdv.day+a.rdv.time).localeCompare(b.rdv.day+b.rdv.time));
+  const g=dem(UI.guichet);const o=g&&obj(g.validated);
+  const C=[['id',`Pièce d’identité vérifiée, au nom de ${g?esc(g.name):''}`],['proof','Réponse ou preuve conforme aux détails privés'],['obj','Objet récupéré en réserve et montré à l’usager'],['sign','Signature de l’usager recueillie']];
+  const all=C.every(([k])=>UI.check[k]);
+  return aShell('agent-guichet',`<h1>Guichet · restitution</h1>
+    <form class="row" id="f-code" novalidate style="flex-wrap:nowrap"><label for="g-code" class="sr">Numéro de rendez-vous</label><input class="input" id="g-code" placeholder="N° de RDV (ex. RDV-3172) ou scan du QR code" style="flex:1;min-width:0"><button class="btn" type="submit">Rechercher</button></form>
+    ${UI.errs.code?`<span class="err">${UI.errs.code}</span>`:''}
+    <div class="cmp">
+      <section class="panel"><h2>Rendez-vous</h2><div class="list">${rdvs.length?rdvs.map(d=>`<button class="li" data-act="openGuichet" data-v="${d.id}" aria-current="${d.id===UI.guichet}">${mini(obj(d.validated))}<span class="tx"><b>${d.rdv.day===TODAY?'Aujourd’hui':esc(fd(d.rdv.day))} · ${esc(d.rdv.time)} · ${esc(d.name)}</b><span class="small muted"><span class="mono">${esc(d.rdv.code)}</span> · étagère ${esc(obj(d.validated).shelf)}</span></span></button>`).join(''):'<p class="muted">Aucun rendez-vous prévu.</p>'}</div></section>
+      <section class="panel">${g&&o?`<div class="panel-h"><h2>${esc(g.name)}</h2><span class="mono">${esc(g.rdv.code)}</span></div>
+        <div class="cand-h">${thumb(o,{masked:false})}<div><b>${esc(o.title)}</b><div class="small muted"><span class="mono">${esc(o.ref)}</span> · à chercher : étagère <b>${esc(o.shelf)}</b></div></div></div>
+        <div class="private"><span class="eyebrow">🔒 À comparer</span><span><b>Détail privé :</b> ${esc(o.priv)}</span><span><b>Réponse de l’usager :</b> « ${esc(g.answer||'—')} »</span></div>
+        <div class="stack" style="gap:8px">${C.map(([k,l])=>`<label class="check" for="c-${k}"><input type="checkbox" id="c-${k}" data-check="${k}" ${UI.check[k]?'checked':''}><span>${l}</span></label>`).join('')}</div>
+        <button class="btn ok block" data-act="restitute" ${all?'':'disabled'}>${all?'Restituer l’objet':'Cochez les 4 vérifications pour restituer'}</button>
+        <button class="btn bad block" data-act="doubt">Doute au guichet · ne pas restituer</button>`
+      :'<p class="muted">Sélectionnez un rendez-vous ou saisissez son numéro.</p>'}</section>
+    </div>`);
+};
+
+V['agent-creneaux']=()=>{
+  const bm=bookedMap();const day=UI.crDay;
+  const open=TIMES.filter(t=>!S.closed.includes(day+' '+t)).length;
+  return aShell('agent-creneaux',`<div class="stack" style="gap:4px"><h1>Créneaux de restitution</h1><p class="muted">Touchez un créneau libre pour le fermer ou le rouvrir. Les habitants ne voient que les créneaux ouverts.</p></div>
+    <div class="days" role="group" aria-label="Jour">${OPEN_DAYS.map(x=>{const dd=D(x);return `<button class="day" data-act="crDay" data-v="${x}" aria-pressed="${x===day}"><span class="small">${dd.toLocaleDateString('fr-FR',{weekday:'short'})}</span><b>${dd.getDate()}</b><span class="small">${dd.toLocaleDateString('fr-FR',{month:'short'})}</span></button>`}).join('')}</div>
+    <section class="panel"><div class="panel-h"><h2 style="text-transform:capitalize">${esc(fdl(day))}</h2><span class="small muted">${open} créneaux ouverts sur ${TIMES.length}</span></div>
+      <div class="row small"><span class="aslot" style="cursor:default;min-height:0">Libre</span><span class="aslot booked" style="min-height:0">Réservé</span><span class="aslot closed" style="cursor:default;min-height:0">Fermé</span></div>
+      <div class="agrid">${TIMES.map(t=>{const k=day+' '+t;const b=bm[k];const taken=!b&&isTaken(day,t);const c=S.closed.includes(k);
+        return b||taken?`<div class="aslot booked">${t}<small>${b?esc(b.name):'Réservé'}</small></div>`:`<button class="aslot ${c?'closed':''}" data-act="toggleSlot" data-v="${k}" aria-pressed="${!c}">${t}<small>${c?'Fermé':'Libre'}</small></button>`}).join('')}</div>
+    </section>`);
+};
+
+/* ===================== Routeur ===================== */
+const USER_ROUTES=['accueil','perdu','resultats','objet','suivi','rdv','trouve','police'];
+function route(){return (location.hash||'').slice(1)||(S.mode==='agent'?'agent':'accueil')}
+function render(){
+  let r=route();
+  if(!V[r]) r=S.mode==='agent'?'agent':'accueil';
+  S.mode=r.startsWith('agent')?'agent':'user';
+  $('#m-user').setAttribute('aria-pressed',S.mode==='user');$('#m-agent').setAttribute('aria-pressed',S.mode==='agent');
+  $('#app').innerHTML=V[r]();
+  save();
+}
+function go(r){UI.errs={};if(location.hash==='#'+r)render();else location.hash=r;window.scrollTo(0,0)}
+window.addEventListener('hashchange',()=>{UI.errs={};render();window.scrollTo(0,0)});
+
+/* ===================== Actions ===================== */
+function nextRef(){S.seq++;return 'DEM-2026-04'+S.seq}
+function readLost(){const d=UI.draft;const g=id=>$(id)&&$(id).value;d.desc=g('#f-desc');d.date=g('#f-date');d.cat=g('#f-cat');d.line=g('#f-line');d.contact=g('#f-mail')}
+function claimDemande(d,ids){d.claim=Array.from(new Set([...(d.claim||[]),...ids]))}
+function vigilance(newObj){
+  const hits=S.demandes.filter(d=>d.status==='veille'&&d.cat===newObj.cat&&match(d).some(x=>x.o.id===newObj.id));
+  hits.forEach(d=>{d.status='resultats';d.hist.push({t:nowStamp(),x:'Veille : nouvel objet '+newObj.ref+' proche · alerte envoyée à l’habitant (simulée)'})});
+  return hits;
+}
+document.addEventListener('click',e=>{
+  const g=e.target.closest('[data-go]');
+  if(g){e.preventDefault();if(g.dataset.go==='accueil'&&S.mode==='user')UI.claimOpen=false;go(g.dataset.go);return}
+  const a=e.target.closest('[data-act]');if(!a)return;
+  const v=a.dataset.v,act=a.dataset.act;
+  if(act==='mode'){go(v==='agent'?'agent':'accueil');return}
+  if(act==='reset'){S=seed();Object.assign(UI,{cur:null,obj:null,draft:{},found:null,agentD:null,guichet:null,check:{},newObj:{},panel:null});save();go(S.mode==='agent'?'agent':'accueil');toast('Démo réinitialisée');return}
+  if(act==='ex'){UI.draft={...EXAMPLES[v]};UI.errs={};render();return}
+  if(act==='openObj'){UI.obj=v;UI.claimOpen=false;go('objet');return}
+  if(act==='claimOpen'){UI.claimOpen=true;render();setTimeout(()=>$('#f-ans')&&$('#f-ans').focus(),0);return}
+  if(act==='claimClose'){UI.claimOpen=false;render();return}
+  if(act==='noneMine'){const d=dem(UI.cur);d.status='veille';d.hist.push({t:nowStamp(),x:'Aucun objet proposé ne convient · veille activée'});UI.cur=d.id;go('suivi');toast('Votre demande reste en veille');return}
+  if(act==='openSuivi'){UI.cur=v;UI.lookupErr='';go('suivi');return}
+  if(act==='rdvDay'){UI.rdvDay=v;UI.rdvTime=null;render();return}
+  if(act==='rdvTime'){UI.rdvTime=v;render();return}
+  if(act==='rdvConfirm'){const d=dem(UI.cur);const was=d.status==='rdv';d.rdv={day:UI.rdvDay,time:UI.rdvTime,code:(d.rdv&&d.rdv.code)||'RDV-'+(1000+Math.floor(Math.random()*9000))};d.status='rdv';obj(d.validated).status='rdv';d.hist.push({t:nowStamp(),x:(was?'RDV modifié : ':'RDV réservé : ')+fd(UI.rdvDay)+' à '+UI.rdvTime});UI.rdvTime=null;go('suivi');toast('Rendez-vous confirmé · rappel envoyé la veille');return}
+  if(act==='cancelRdv'){const d=dem(UI.cur);d.status='validee';d.rdv=null;obj(d.validated).status='correspondance';d.hist.push({t:nowStamp(),x:'RDV annulé par l’habitant'});render();toast('Rendez-vous annulé · le créneau est libéré');return}
+  if(act==='cancelDem'){const d=dem(UI.cur);if(d.validated){const o=obj(d.validated);if(['rdv','correspondance'].includes(o.status))o.status='stock'}d.status='annulee';d.hist.push({t:nowStamp(),x:'Demande annulée par l’habitant'});render();toast('Demande annulée');return}
+  if(act==='foundNew'){UI.found=null;render();return}
+  /* agent */
+  if(act==='dfilter'){UI.dfilter=v;go('agent-demandes');return}
+  if(act==='ifilter'){UI.ifilter=v;UI.iq='';go('agent-inventaire');return}
+  if(act==='openDem'){UI.agentD=v;UI.panel=null;go('agent-demande');return}
+  if(act==='openObjA'){UI.openObj=UI.openObj===v?null:v;if(route()!=='agent-inventaire'){UI.ifilter='';UI.iq='';go('agent-inventaire')}else render();return}
+  if(act==='panel'){UI.panel=v||null;render();return}
+  if(act==='validate'){const d=dem(UI.agentD);claimDemande(d,[v]);d.validated=v;d.status='validee';obj(v).status='correspondance';d.hist.push({t:nowStamp(),x:'Correspondance validée par Sophie M. ('+obj(v).ref+') · invitation à prendre RDV envoyée'});UI.panel=null;render();toast('Validé · l’habitant peut maintenant prendre rendez-vous');return}
+  if(act==='openGuichet'){UI.guichet=v;UI.check={};if(route()!=='agent-guichet')go('agent-guichet');else render();return}
+  if(act==='restitute'){const d=dem(UI.guichet),o=obj(d.validated);d.status='restituee';o.status='restitue';d.hist.push({t:nowStamp(),x:'Objet restitué au guichet par Sophie M. · signature recueillie'});UI.guichet=null;UI.check={};render();toast('Objet restitué · demande clôturée');return}
+  if(act==='doubt'){const d=dem(UI.guichet),o=obj(d.validated);d.status='refusee';d.msg='Lors de votre passage, les vérifications au guichet n’ont pas permis de confirmer que l’objet vous appartient. Vous pouvez ajouter une preuve.';o.status='stock';d.hist.push({t:nowStamp(),x:'Doute au guichet : restitution refusée, objet remis en stock'});d.rdv=null;UI.guichet=null;UI.check={};render();toast('Restitution refusée · objet remis en stock');return}
+  if(act==='crDay'){UI.crDay=v;render();return}
+  if(act==='toggleSlot'){const i=S.closed.indexOf(v);if(i>=0)S.closed.splice(i,1);else S.closed.push(v);render();return}
+  if(act==='sample'){UI.newObj={analyzing:true,photo:AI_SAMPLES[v].photo};render();setTimeout(()=>{UI.newObj={...AI_SAMPLES[v],ai:true,line:'Tram T2',date:TODAY,shelf:'A2'};render()},800);return}
+});
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.id==='f-cat'){readLost();render();return}
+  if(t.id==='f-photo'&&t.files[0]){readLost();UI.draft.photoName=t.files[0].name;render();return}
+  if(t.dataset.check){UI.check[t.dataset.check]=t.checked;render();return}
+  if(t.id==='i-f'){UI.ifilter=t.value;render();return}
+  if(t.id==='n-photo'&&t.files[0]){const fr=new FileReader();fr.onload=()=>{UI.newObj={photo:fr.result,analyzing:true};render();setTimeout(()=>{UI.newObj={...UI.newObj,analyzing:false,ai:true,cat:'autre',color:'noir',date:TODAY,shelf:'A2'};render()},900)};fr.readAsDataURL(t.files[0]);return}
+});
+document.addEventListener('input',e=>{if(e.target.id==='i-q'){UI.iq=e.target.value;const pos=e.target.selectionStart;render();const i=$('#i-q');i.focus();i.setSelectionRange(pos,pos)}});
+document.addEventListener('submit',e=>{
+  e.preventDefault();const f=e.target;
+  if(f.id==='f-lost'){
+    readLost();const d=UI.draft,er={};
+    if(!d.desc||d.desc.trim().length<5)er.desc='Décrivez votre objet en quelques mots.';
+    if(!d.date)er.date='Indiquez la date de la perte.';
+    if(!d.cat)er.cat='Choisissez un type d’objet.';
+    if(!d.contact||d.contact.trim().length<6)er.contact='Indiquez un e-mail ou un numéro pour être prévenu·e.';
+    UI.errs=er;if(Object.keys(er).length){render();return}
+    const nd={id:'D'+Date.now(),ref:nextRef(),name:d.name||'Vous',contact:d.contact,cat:d.cat,desc:d.desc,date:d.date,line:d.line||'?',status:'resultats',claim:[],answer:'',msg:'',hist:[{t:nowStamp(),x:'Demande envoyée'}]};
+    const r=match(nd);
+    if(!r.length){nd.status='veille';nd.hist.push({t:nowStamp(),x:'Aucun objet correspondant · veille activée'})}else nd.hist.push({t:nowStamp(),x:'Suggestion IA : '+r.length+' objet'+(r.length>1?'s':'')+' ('+r.map(x=>x.s+' %').join(', ')+')'});
+    S.demandes.unshift(nd);S.mine.unshift(nd.id);UI.cur=nd.id;UI.draft={};go('resultats');return;
+  }
+  if(f.id==='f-claim'){
+    const ans=$('#f-ans').value.trim();if(!ans){UI.errs={ans:'Répondez à la question pour que l’agent puisse vérifier.'};render();return}
+    const d=dem(UI.cur);claimDemande(d,[UI.obj]);d.answer=ans;d.status='verif';d.hist.push({t:nowStamp(),x:'L’habitant revendique '+obj(UI.obj).ref+' et répond à la question de contrôle'});UI.claimOpen=false;go('suivi');toast('Envoyé · un agent vérifie votre demande');return;
+  }
+  if(f.id==='f-prec'){
+    const t=$('#f-precision').value.trim();if(!t)return;const d=dem(UI.cur);d.answer=(d.answer?d.answer+' / ':'')+t;
+    if(d.validated){const o=obj(d.validated);if(o.status==='stock')o.status='stock'}d.status='verif';d.hist.push({t:nowStamp(),x:'Précision ajoutée par l’habitant'});render();toast('Merci · votre réponse a été transmise');return;
+  }
+  if(f.id==='f-lookup'){
+    const q=$('#f-ref').value.trim().toUpperCase();const d=S.demandes.find(x=>x.ref===q);
+    if(!d){UI.lookupErr='Aucune demande avec cette référence. Vérifiez l’e-mail de confirmation.';render();return}
+    if(!S.mine.includes(d.id))S.mine.push(d.id);UI.cur=d.id;UI.lookupErr='';render();return;
+  }
+  if(f.id==='f-found'){
+    const c=$('#g-cat').value;if(!c){UI.errs={g:'Choisissez le type d’objet.'};render();return}
+    UI.found={ref:'DEP-'+(2000+Math.floor(Math.random()*8000)),cat:c};UI.errs={};render();window.scrollTo(0,0);return;
+  }
+  if(f.id==='f-agent'){
+    const d=dem(UI.agentD);const msg=$('#a-msg').value.trim();
+    if(UI.panel==='precision'){d.status='precision';d.msg=msg;d.hist.push({t:nowStamp(),x:'Précision demandée par Sophie M.'});toast('Demande de précision envoyée à l’habitant')}
+    else{d.status='refusee';d.msg=msg;if(d.validated&&obj(d.validated).status!=='restitue')obj(d.validated).status='stock';d.claim.forEach(id=>{const o=obj(id);if(o.status==='correspondance')o.status='stock'});d.hist.push({t:nowStamp(),x:'Non confirmée par Sophie M. · motif communiqué'});toast('Demande marquée « non confirmée »')}
+    UI.panel=null;render();return;
+  }
+  if(f.id==='f-code'){
+    const q=$('#g-code').value.trim().toUpperCase();const d=S.demandes.find(x=>x.status==='rdv'&&x.rdv.code===q);
+    if(!d){UI.errs={code:'Aucun rendez-vous actif avec ce numéro.'};render();return}
+    UI.guichet=d.id;UI.check={};UI.errs={};render();return;
+  }
+  if(f.id==='f-new'){
+    const g=id=>$(id).value.trim();const sens=$('#n-sens').checked;const cat=sens?'sensible':g('#n-cat');
+    if(!cat||!g('#n-color')){UI.errs={n:'Indiquez au moins le type et la couleur.'};render();return}
+    S.seq++;const o={id:'O'+Date.now(),ref:'PDV-2026-0'+(300+S.seq),cat,color:g('#n-color'),line:g('#n-line'),date:g('#n-date')||TODAY,brand:g('#n-brand')||'—',title:g('#n-title')||CATS[cat].l,priv:g('#n-priv')||'—',q:g('#n-q')||'—',a:g('#n-a')||'—',kw:(UI.newObj.kw||norm(g('#n-priv')).split(/\W+/).filter(w=>w.length>4)),shelf:g('#n-shelf')||'—',status:sens?'police':'stock',agent:'Sophie M.',photo:UI.newObj.photo||null};
+    S.objects.unshift(o);
+    const hits=sens?[]:vigilance(o);
+    const next=e.submitter&&e.submitter.dataset.next==='1';
+    UI.newObj={};UI.errs={};
+    if(next){render();window.scrollTo(0,0)}else{UI.ifilter='';UI.iq='';UI.openObj=o.id;go('agent-inventaire')}
+    toast(sens?o.ref+' enregistré · à transmettre à la police':hits.length?o.ref+' enregistré · '+hits.length+' demande en veille correspond ('+hits.map(h=>h.name).join(', ')+'), habitant prévenu':o.ref+' enregistré · étiquette prête');
+    return;
+  }
+});
+render();
+</script>
