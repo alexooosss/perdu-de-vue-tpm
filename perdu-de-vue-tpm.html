@@ -1,3 +1,8 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Perdu de vue</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -279,6 +284,8 @@ textarea.input{min-height:120px;resize:vertical}
 .cand.claimed{border-color:var(--sea);box-shadow:0 0 0 3px var(--sea-soft)}
 .cand-h{display:flex;gap:12px;align-items:center}
 .cand-h .thumb{width:60px;flex:none;border-radius:14px}
+.cand-h .badge{white-space:normal;max-width:100%}
+@media(max-width:559px){.cand-h{flex-wrap:wrap}.cand-h>div:last-child{width:100%;display:flex;align-items:baseline;gap:8px;text-align:left!important;padding-left:72px}}
 .why{list-style:none;margin:0;padding:0;display:grid;gap:4px;font-size:.88rem}
 .why li{display:flex;gap:8px}
 .why .k{width:18px;flex:none;font-weight:700;text-align:center}
@@ -313,6 +320,8 @@ textarea.input{min-height:120px;resize:vertical}
 .logo.has-img{border:0;background:none;padding:0}.logo.has-img span{display:none}.logo img{height:40px;width:auto;display:block}
 .alogo{height:34px;width:auto}.side .top:has(.alogo)::before{display:none}
 </style>
+</head>
+<body>
 
 <div class="demo"><div class="in gut">
   <span class="tag">Prototype · cas pédagogique fictif · IA simulée</span>
@@ -964,3 +973,5 @@ document.addEventListener('submit',e=>{
 });
 render();
 </script>
+</body>
+</html>
